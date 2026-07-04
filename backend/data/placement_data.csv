@@ -1,0 +1,11 @@
+student_id,name,target_role,resume_skills,mock_interview_score,communication_score,technical_score,placement_readiness_score,missing_skills,github_projects,certifications
+S001,Priya Mehta,Backend Engineer,"Python,FastAPI,SQL,Docker,Git,Arrays,Linked Lists,Sorting",82,78,85,83,"System Design,Kubernetes","3 projects","AWS Cloud Practitioner"
+S002,Rahul Gupta,Full Stack Developer,"HTML,CSS,JavaScript,React,Python,SQL",65,70,62,64,"System Design,Node.js,Docker,Recursion,Dynamic Programming","1 project","None"
+S003,Sneha Iyer,Data Scientist,"Python,ML,Pandas,NumPy,SQL,Recursion,Trees,Graphs",91,85,93,90,"MLOps,Spark,System Design","5 projects","Google ML Certification"
+S007,Kavya Nair,Software Engineer,"Python,Java,Data Structures,Algorithms,Trees,Graphs,Dynamic Programming",88,82,90,87,"System Design,Microservices","4 projects","Oracle Java Certified"
+S042,Aryan Sharma,Software Engineer,"Python,HTML,CSS,JavaScript,Arrays,Sorting,SQL basics",48,60,42,50,"Recursion,Trees,Graphs,System Design,Dynamic Programming,Data Structures (intermediate),Backend Frameworks,Docker","0 projects","None"
+S009,Deepa Pillai,Backend Developer,"Python,Django,SQL,PostgreSQL,REST APIs,Data Structures",80,75,83,79,"System Design,Redis,Docker","2 projects","None"
+S010,Nikhil Reddy,Mobile Developer,"Python,Kotlin,Android,SQL,Data Structures",72,68,75,72,"System Design,React Native,Algorithms","2 projects","None"
+S004,Vikram Singh,Full Stack Developer,"HTML,CSS,JavaScript,Python basics,SQL",55,62,52,55,"Algorithms,Data Structures,React,Node.js,Docker,System Design","0 projects","None"
+S005,Anjali Sharma,Data Analyst,"Python,SQL,Pandas,Excel,Data Structures,Sorting",76,80,74,76,"Machine Learning,Visualization,Statistics","2 projects","None"
+S008,Amit Joshi,Software Engineer,"Python basics,HTML,CSS,SQL","45","55","42","46","All core DSA topics,System Design,Backend Framework,Version Control","0 projects","None"

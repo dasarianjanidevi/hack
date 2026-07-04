@@ -1,0 +1,16 @@
+chat_id,student_id,date,category,topic_mentioned,message_summary,sentiment,resolved
+C001,S042,2024-01-22,Academic Help,Recursion,"Student asked: I don't understand how recursive functions return values. The stack trace confuses me.",confused,no
+C002,S042,2024-01-23,Academic Help,Recursion,"Student asked: Can someone explain base cases with a simple example? I keep getting stack overflow errors.",frustrated,no
+C003,S042,2024-01-25,Technical Issue,Coding Platform,"Student reported: The recursion problems on the coding platform are too hard. I give up after 10 minutes.",frustrated,no
+C004,S042,2024-01-27,Academic Help,Recursion,"Student asked: Is recursion really necessary? Can I just use loops for everything?",confused,yes
+C005,S042,2024-02-01,General,Trees,"Student asked: Do I need recursion for trees? I'm worried about the upcoming test.",anxious,yes
+C006,S001,2024-01-20,Academic Help,Arrays,"Student asked: What is the best approach for sliding window problems?",curious,yes
+C007,S003,2024-01-15,General,General,"Student asked: Are there any extra practice resources for advanced recursion?",motivated,yes
+C008,S004,2024-01-22,Academic Help,Recursion,"Student asked: I don't understand memoization. How does it work?",confused,no
+C009,S004,2024-01-28,Complaint,Recursion,"Student complained: The recursion topic is too dense. Not enough examples in the video.",frustrated,no
+C010,S002,2024-01-23,Academic Help,Recursion,"Student asked: Can we get extra sessions on recursion? I'm not confident.",anxious,yes
+C011,S008,2024-01-24,Academic Help,Recursion,"Student asked: I'm completely lost on recursion. I've watched the video 3 times.",frustrated,no
+C012,S016,2024-01-25,Academic Help,Recursion,"Student asked: How do you trace through recursive calls? My diagram is wrong.",confused,no
+C013,S018,2024-01-26,Complaint,Recursion,"Student complained: Recursion video is too fast. Please provide a slower explanation.",frustrated,no
+C014,S005,2024-01-24,Academic Help,Linked Lists,"Student asked: Difference between singly and doubly linked list reversal?",curious,yes
+C015,S009,2024-01-30,General,Trees,"Student asked: BST insertion — do we need to handle duplicates?",curious,yes

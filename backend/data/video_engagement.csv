@@ -1,0 +1,48 @@
+student_id,lesson,topic,pct_watched,completion_status,date
+S001,Intro to Arrays,Arrays,95,completed,2024-01-08
+S001,Linked List Basics,Linked Lists,88,completed,2024-01-15
+S001,Understanding Recursion,Recursion,82,completed,2024-01-22
+S001,Binary Trees,Trees,90,completed,2024-01-29
+S001,Bubble Sort,Sorting,87,completed,2024-02-05
+S002,Intro to Arrays,Arrays,75,completed,2024-01-08
+S002,Linked List Basics,Linked Lists,70,completed,2024-01-15
+S002,Understanding Recursion,Recursion,65,partial,2024-01-22
+S002,Binary Trees,Trees,72,completed,2024-01-29
+S002,Bubble Sort,Sorting,68,partial,2024-02-05
+S003,Intro to Arrays,Arrays,98,completed,2024-01-08
+S003,Linked List Basics,Linked Lists,96,completed,2024-01-15
+S003,Understanding Recursion,Recursion,97,completed,2024-01-22
+S003,Binary Trees,Trees,95,completed,2024-01-29
+S003,Bubble Sort,Sorting,99,completed,2024-02-05
+S042,Intro to Arrays,Arrays,80,completed,2024-01-08
+S042,Linked List Basics,Linked Lists,72,partial,2024-01-15
+S042,Understanding Recursion,Recursion,22,not_started,2024-01-22
+S042,Recursion Part 2 - Base Cases,Recursion,15,not_started,2024-01-23
+S042,Recursion Part 3 - Tree Recursion,Recursion,0,not_started,2024-01-24
+S042,Binary Trees,Trees,68,partial,2024-01-29
+S042,Bubble Sort,Sorting,75,completed,2024-02-05
+S004,Intro to Arrays,Arrays,62,partial,2024-01-08
+S004,Linked List Basics,Linked Lists,58,partial,2024-01-15
+S004,Understanding Recursion,Recursion,60,partial,2024-01-22
+S004,Binary Trees,Trees,64,partial,2024-01-29
+S004,Bubble Sort,Sorting,59,partial,2024-02-05
+S005,Intro to Arrays,Arrays,85,completed,2024-01-08
+S005,Linked List Basics,Linked Lists,82,completed,2024-01-15
+S005,Understanding Recursion,Recursion,84,completed,2024-01-22
+S005,Binary Trees,Trees,83,completed,2024-01-29
+S005,Bubble Sort,Sorting,86,completed,2024-02-05
+S007,Intro to Arrays,Arrays,96,completed,2024-01-08
+S007,Linked List Basics,Linked Lists,94,completed,2024-01-15
+S007,Understanding Recursion,Recursion,97,completed,2024-01-22
+S007,Binary Trees,Trees,95,completed,2024-01-29
+S007,Bubble Sort,Sorting,98,completed,2024-02-05
+S009,Intro to Arrays,Arrays,88,completed,2024-01-08
+S009,Linked List Basics,Linked Lists,86,completed,2024-01-15
+S009,Understanding Recursion,Recursion,89,completed,2024-01-22
+S009,Binary Trees,Trees,87,completed,2024-01-29
+S009,Bubble Sort,Sorting,90,completed,2024-02-05
+S010,Intro to Arrays,Arrays,76,completed,2024-01-08
+S010,Linked List Basics,Linked Lists,73,completed,2024-01-15
+S010,Understanding Recursion,Recursion,75,completed,2024-01-22
+S010,Binary Trees,Trees,77,completed,2024-01-29
+S010,Bubble Sort,Sorting,74,completed,2024-02-05

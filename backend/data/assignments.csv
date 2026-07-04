@@ -1,0 +1,46 @@
+student_id,assignment,topic,status,score,submitted_date,due_date
+S001,Assignment 1 - Array Manipulation,Arrays,submitted,88,2024-01-12,2024-01-14
+S001,Assignment 2 - Linked List Reversal,Linked Lists,submitted,82,2024-01-19,2024-01-21
+S001,Assignment 3 - Fibonacci Recursion,Recursion,submitted,78,2024-01-26,2024-01-28
+S001,Assignment 4 - BST Operations,Trees,submitted,85,2024-02-02,2024-02-04
+S001,Assignment 5 - Merge Sort,Sorting,submitted,87,2024-02-09,2024-02-11
+S002,Assignment 1 - Array Manipulation,Arrays,submitted,70,2024-01-13,2024-01-14
+S002,Assignment 2 - Linked List Reversal,Linked Lists,submitted,66,2024-01-20,2024-01-21
+S002,Assignment 3 - Fibonacci Recursion,Recursion,submitted,63,2024-01-27,2024-01-28
+S002,Assignment 4 - BST Operations,Trees,submitted,68,2024-02-03,2024-02-04
+S002,Assignment 5 - Merge Sort,Sorting,submitted,65,2024-02-10,2024-02-11
+S003,Assignment 1 - Array Manipulation,Arrays,submitted,95,2024-01-11,2024-01-14
+S003,Assignment 2 - Linked List Reversal,Linked Lists,submitted,93,2024-01-18,2024-01-21
+S003,Assignment 3 - Fibonacci Recursion,Recursion,submitted,94,2024-01-25,2024-01-28
+S003,Assignment 4 - BST Operations,Trees,submitted,92,2024-02-01,2024-02-04
+S003,Assignment 5 - Merge Sort,Sorting,submitted,96,2024-02-08,2024-02-11
+S042,Assignment 1 - Array Manipulation,Arrays,submitted,74,2024-01-13,2024-01-14
+S042,Assignment 2 - Linked List Reversal,Linked Lists,late_submitted,65,2024-01-23,2024-01-21
+S042,Assignment 3 - Fibonacci Recursion,Recursion,not_submitted,,2024-01-28
+S042,Assignment 4 - BST Operations,Trees,submitted,68,2024-02-04,2024-02-04
+S042,Assignment 5 - Merge Sort,Sorting,submitted,71,2024-02-11,2024-02-11
+S004,Assignment 1 - Array Manipulation,Arrays,submitted,60,2024-01-14,2024-01-14
+S004,Assignment 2 - Linked List Reversal,Linked Lists,submitted,57,2024-01-21,2024-01-21
+S004,Assignment 3 - Fibonacci Recursion,Recursion,late_submitted,50,2024-01-30,2024-01-28
+S004,Assignment 4 - BST Operations,Trees,submitted,62,2024-02-04,2024-02-04
+S004,Assignment 5 - Merge Sort,Sorting,submitted,55,2024-02-11,2024-02-11
+S005,Assignment 1 - Array Manipulation,Arrays,submitted,83,2024-01-12,2024-01-14
+S005,Assignment 2 - Linked List Reversal,Linked Lists,submitted,80,2024-01-19,2024-01-21
+S005,Assignment 3 - Fibonacci Recursion,Recursion,submitted,81,2024-01-26,2024-01-28
+S005,Assignment 4 - BST Operations,Trees,submitted,82,2024-02-02,2024-02-04
+S005,Assignment 5 - Merge Sort,Sorting,submitted,84,2024-02-09,2024-02-11
+S007,Assignment 1 - Array Manipulation,Arrays,submitted,94,2024-01-11,2024-01-14
+S007,Assignment 2 - Linked List Reversal,Linked Lists,submitted,92,2024-01-18,2024-01-21
+S007,Assignment 3 - Fibonacci Recursion,Recursion,submitted,95,2024-01-25,2024-01-28
+S007,Assignment 4 - BST Operations,Trees,submitted,93,2024-02-01,2024-02-04
+S007,Assignment 5 - Merge Sort,Sorting,submitted,96,2024-02-08,2024-02-11
+S009,Assignment 1 - Array Manipulation,Arrays,submitted,87,2024-01-12,2024-01-14
+S009,Assignment 2 - Linked List Reversal,Linked Lists,submitted,85,2024-01-19,2024-01-21
+S009,Assignment 3 - Fibonacci Recursion,Recursion,submitted,88,2024-01-26,2024-01-28
+S009,Assignment 4 - BST Operations,Trees,submitted,86,2024-02-02,2024-02-04
+S009,Assignment 5 - Merge Sort,Sorting,submitted,89,2024-02-09,2024-02-11
+S010,Assignment 1 - Array Manipulation,Arrays,submitted,75,2024-01-12,2024-01-14
+S010,Assignment 2 - Linked List Reversal,Linked Lists,submitted,73,2024-01-19,2024-01-21
+S010,Assignment 3 - Fibonacci Recursion,Recursion,submitted,74,2024-01-26,2024-01-28
+S010,Assignment 4 - BST Operations,Trees,submitted,76,2024-02-02,2024-02-04
+S010,Assignment 5 - Merge Sort,Sorting,submitted,72,2024-02-09,2024-02-11

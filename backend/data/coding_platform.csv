@@ -1,0 +1,47 @@
+student_id,date,problems_attempted,problems_solved,success_rate_pct,avg_difficulty,avg_time_minutes,topics_practiced
+S001,2024-01-10,12,10,83,Medium,28,Arrays
+S001,2024-01-17,10,8,80,Medium,32,Linked Lists
+S001,2024-01-24,8,6,75,Medium,40,Recursion
+S001,2024-01-31,11,9,82,Hard,45,Trees
+S001,2024-02-07,9,8,89,Medium,30,Sorting
+S002,2024-01-10,8,5,62,Easy,35,Arrays
+S002,2024-01-17,7,4,57,Easy,40,Linked Lists
+S002,2024-01-24,5,3,60,Easy,50,Recursion
+S002,2024-01-31,8,5,62,Medium,42,Trees
+S002,2024-02-07,9,6,67,Easy,38,Sorting
+S003,2024-01-10,15,14,93,Hard,22,Arrays
+S003,2024-01-17,13,12,92,Hard,25,Linked Lists
+S003,2024-01-24,12,12,100,Hard,28,Recursion
+S003,2024-01-31,14,13,93,Hard,30,Trees
+S003,2024-02-07,15,14,93,Hard,20,Sorting
+S042,2024-01-10,10,7,70,Medium,35,Arrays
+S042,2024-01-17,8,6,75,Easy,38,Linked Lists
+S042,2024-01-24,3,0,0,Easy,65,Recursion
+S042,2024-01-28,2,0,0,Easy,70,Recursion
+S042,2024-01-31,9,6,67,Medium,40,Trees
+S042,2024-02-07,8,6,75,Medium,35,Sorting
+S004,2024-01-10,7,4,57,Easy,42,Arrays
+S004,2024-01-17,6,3,50,Easy,48,Linked Lists
+S004,2024-01-24,4,2,50,Easy,60,Recursion
+S004,2024-01-31,7,4,57,Easy,45,Trees
+S004,2024-02-07,8,5,62,Easy,40,Sorting
+S005,2024-01-10,11,9,82,Medium,30,Arrays
+S005,2024-01-17,10,8,80,Medium,33,Linked Lists
+S005,2024-01-24,9,7,78,Medium,38,Recursion
+S005,2024-01-31,10,8,80,Medium,36,Trees
+S005,2024-02-07,11,9,82,Medium,28,Sorting
+S007,2024-01-10,14,13,93,Hard,24,Arrays
+S007,2024-01-17,13,12,92,Hard,26,Linked Lists
+S007,2024-01-24,14,14,100,Hard,22,Recursion
+S007,2024-01-31,13,12,92,Hard,28,Trees
+S007,2024-02-07,15,14,93,Hard,20,Sorting
+S009,2024-01-10,12,10,83,Medium,28,Arrays
+S009,2024-01-17,11,9,82,Medium,30,Linked Lists
+S009,2024-01-24,10,8,80,Hard,35,Recursion
+S009,2024-01-31,11,9,82,Medium,32,Trees
+S009,2024-02-07,12,10,83,Medium,27,Sorting
+S010,2024-01-10,9,7,78,Medium,33,Arrays
+S010,2024-01-17,8,6,75,Medium,36,Linked Lists
+S010,2024-01-24,7,5,71,Medium,40,Recursion
+S010,2024-01-31,9,7,78,Medium,34,Trees
+S010,2024-02-07,10,8,80,Medium,30,Sorting

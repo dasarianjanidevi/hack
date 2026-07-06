@@ -71,14 +71,13 @@ export default function AgentTimeline({ steps, stepStates, activeTab, onSelect }
         </p>
       </div>
 
-      {/* Steps */}
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {steps.map((step, i) => {
           const state = stepStates[step.key];
           const isActive = activeTab === step.key;
           const isDone = state.status === "done";
           const isRunning = state.status === "running";
-          const isClickable = isDone || isRunning;
+          const isClickable = isDone || isRunning || state.status === "error";
 
           return (
             <div key={step.key} style={{ position: "relative" }}>

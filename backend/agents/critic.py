@@ -71,6 +71,20 @@ async def run_critic(diagnosis: DiagnosisResult) -> CriticResult:
     student_id = diagnosis.student_id
     weak_topic = diagnosis.weak_topic
 
+    # Short-circuit in mock mode — skip RAG/ChromaDB calls
+    if MOCK_MODE:
+        m = get_mock_response("critic")
+        return CriticResult(
+            verified=bool(m["verified"]),
+            confidence=float(m["confidence"]),
+            original_confidence=diagnosis.confidence,
+            verdict=m["verdict"],
+            supporting_evidence=m.get("supporting_evidence", []),
+            contradicting_evidence=m.get("contradicting_evidence", []),
+            reason=m["reason"],
+            recommendation=m["recommendation"],
+        )
+
     # 1. Retrieve assignment evidence (primary cross-check source)
     assignment_chunks = retrieve(
         query=f"assignment submission completion status {weak_topic} {diagnosis.student_name}",

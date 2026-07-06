@@ -105,6 +105,26 @@ async def run_prediction(diagnosis: DiagnosisResult, critic: CriticResult) -> Pr
     """
     Generate multi-dimensional predictions for the student.
     """
+    if MOCK_MODE:
+        m = get_mock_response("prediction")
+        return PredictionResult(
+            student_name=diagnosis.student_name,
+            predicted_semester_grade=m["predicted_semester_grade"],
+            predicted_semester_score=float(m["predicted_semester_score"]),
+            placement_probability_pct=float(m["placement_probability_pct"]),
+            dropout_risk=m["dropout_risk"],
+            dropout_risk_score=float(m["dropout_risk_score"]),
+            learning_velocity=m["learning_velocity"],
+            at_risk_topics=m["at_risk_topics"],
+            strong_topics=m["strong_topics"],
+            intervention_urgency=m["intervention_urgency"],
+            prediction_confidence=float(m["prediction_confidence"]),
+            key_risk_factors=m["key_risk_factors"],
+            positive_signals=m["positive_signals"],
+            predicted_outcome_if_no_action=m["predicted_outcome_if_no_action"],
+            predicted_outcome_with_intervention=m["predicted_outcome_with_intervention"],
+        )
+
     student_id = diagnosis.student_id
     signals = _load_full_student_context(student_id)
 
@@ -150,26 +170,6 @@ Return EXACTLY this JSON:
   "predicted_outcome_with_intervention": "one sentence — expected outcome with the tutor plan"
 }}
 """
-
-    if MOCK_MODE:
-        m = get_mock_response("prediction")
-        return PredictionResult(
-            student_name=diagnosis.student_name,
-            predicted_semester_grade=m["predicted_semester_grade"],
-            predicted_semester_score=float(m["predicted_semester_score"]),
-            placement_probability_pct=float(m["placement_probability_pct"]),
-            dropout_risk=m["dropout_risk"],
-            dropout_risk_score=float(m["dropout_risk_score"]),
-            learning_velocity=m["learning_velocity"],
-            at_risk_topics=m["at_risk_topics"],
-            strong_topics=m["strong_topics"],
-            intervention_urgency=m["intervention_urgency"],
-            prediction_confidence=float(m["prediction_confidence"]),
-            key_risk_factors=m["key_risk_factors"],
-            positive_signals=m["positive_signals"],
-            predicted_outcome_if_no_action=m["predicted_outcome_if_no_action"],
-            predicted_outcome_with_intervention=m["predicted_outcome_with_intervention"],
-        )
 
     raw = chat(system_prompt, user_prompt, temperature=0.3)
     parsed = parse_json_response(raw)

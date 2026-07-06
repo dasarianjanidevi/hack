@@ -47,6 +47,29 @@ async def run_tutor(diagnosis: DiagnosisResult, critic: CriticResult) -> TutorPl
     """
     weak_topic = diagnosis.weak_topic
 
+    # Short-circuit in mock mode — skip RAG/ChromaDB calls
+    if MOCK_MODE:
+        m = get_mock_response("tutor")
+        days = [
+            DayPlan(
+                day=d["day"],
+                focus=d["focus"],
+                concepts=d["concepts"],
+                resources=d["resources"],
+                exercise=d["exercise"],
+                estimated_time=d["estimated_time"],
+            )
+            for d in m["days"]
+        ]
+        return TutorPlan(
+            student_name=diagnosis.student_name,
+            weak_topic=weak_topic,
+            overall_goal=m["overall_goal"],
+            days=days,
+            prerequisite_check=m["prerequisite_check"],
+            success_metric=m["success_metric"],
+        )
+
     # Retrieve curriculum content for the weak topic
     curriculum_chunks = retrieve(
         query=f"{weak_topic} learning outcomes prerequisites exercises practice",

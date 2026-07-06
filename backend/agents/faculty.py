@@ -43,6 +43,20 @@ async def run_faculty(
     """
     Generate an instructor intervention note.
     """
+    if MOCK_MODE:
+        m = get_mock_response("faculty")
+        return FacultyNote(
+            to=m["to"],
+            from_agent="EduOS AI — Faculty Notification Agent",
+            subject=m["subject"],
+            student_name=diagnosis.student_name,
+            urgency=m["urgency"],
+            summary=m["summary"],
+            body=m["body"],
+            action_items=m.get("action_items", []),
+            follow_up_date=m.get("follow_up_date", "Within 48 hours"),
+        )
+
     tutor_summary = f"5-day plan goal: {tutor_plan.overall_goal}. Success metric: {tutor_plan.success_metric}"
     day_titles = [f"Day {d.day}: {d.focus}" for d in tutor_plan.days]
 
@@ -88,20 +102,6 @@ Write the intervention note. Return EXACTLY this JSON:
   "follow_up_date": "Suggest a follow-up date (e.g. 'Within 48 hours' or a specific day)"
 }}
 """
-
-    if MOCK_MODE:
-        m = get_mock_response("faculty")
-        return FacultyNote(
-            to=m["to"],
-            from_agent="EduOS AI — Faculty Notification Agent",
-            subject=m["subject"],
-            student_name=diagnosis.student_name,
-            urgency=m["urgency"],
-            summary=m["summary"],
-            body=m["body"],
-            action_items=m.get("action_items", []),
-            follow_up_date=m.get("follow_up_date", "Within 48 hours"),
-        )
 
     raw = chat(system_prompt, user_prompt, temperature=0.5)
     parsed = parse_json_response(raw)

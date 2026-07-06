@@ -12,7 +12,14 @@ load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai").lower()
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
 ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5")
-MOCK_MODE = os.environ.get("MOCK_MODE", "false").lower() == "true"
+_mock_env = os.environ.get("MOCK_MODE", "").lower()
+if _mock_env == "true":
+    MOCK_MODE = True
+elif _mock_env == "false":
+    MOCK_MODE = False
+else:
+    # If MOCK_MODE environment variable is not set, default to True if no API keys are configured
+    MOCK_MODE = not (os.environ.get("OPENAI_API_KEY") or os.environ.get("ANTHROPIC_API_KEY"))
 
 
 def chat(system_prompt: str, user_prompt: str, temperature: float = 0.3) -> str:

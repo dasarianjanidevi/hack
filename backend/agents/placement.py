@@ -79,6 +79,13 @@ async def run_placement(diagnosis: DiagnosisResult) -> dict:
     target_role = placement_data.get("target_role", "Software Engineer")
     job_desc = JOB_DESCRIPTIONS.get(target_role, JOB_DESCRIPTIONS["Software Engineer"])
 
+    # Short-circuit in mock mode — skip RAG/ChromaDB calls
+    if MOCK_MODE:
+        m = get_mock_response("placement")
+        m["student_name"] = diagnosis.student_name
+        m["student_id"] = student_id
+        return m
+
     # Retrieve relevant industry/curriculum context
     curriculum_chunks = retrieve(
         query=f"skills required for {target_role} placement readiness advanced topics",

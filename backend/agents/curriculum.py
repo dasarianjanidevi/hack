@@ -81,6 +81,27 @@ def _get_support_chat_topics() -> dict:
 
 async def run_curriculum() -> CurriculumReport:
     """Analyze all students and generate cohort-level curriculum recommendations."""
+    if MOCK_MODE:
+        m = get_mock_response("curriculum")
+        critical = [
+            CurriculumRecommendation(
+                topic=t["topic"],
+                students_struggling=t["students_struggling"],
+                total_students=t["total_students"],
+                failure_rate_pct=t["failure_rate_pct"],
+                root_causes=t["root_causes"],
+                recommendations=t["recommendations"],
+            )
+            for t in m.get("critical_topics", [])
+        ]
+        return CurriculumReport(
+            total_students_analyzed=m.get("total_students_analyzed", 60),
+            critical_topics=critical,
+            overall_health_score=float(m.get("overall_health_score", 70)),
+            top_insight=m.get("top_insight", ""),
+            action_summary=m.get("action_summary", []),
+        )
+
     topic_stats = _compute_topic_stats()
     chat_mentions = _get_support_chat_topics()
 
@@ -133,27 +154,6 @@ Return EXACTLY this JSON:
   "action_summary": ["action 1", "action 2", "action 3"]
 }}
 """
-
-    if MOCK_MODE:
-        m = get_mock_response("curriculum")
-        critical = [
-            CurriculumRecommendation(
-                topic=t["topic"],
-                students_struggling=t["students_struggling"],
-                total_students=t["total_students"],
-                failure_rate_pct=t["failure_rate_pct"],
-                root_causes=t["root_causes"],
-                recommendations=t["recommendations"],
-            )
-            for t in m.get("critical_topics", [])
-        ]
-        return CurriculumReport(
-            total_students_analyzed=m.get("total_students_analyzed", 60),
-            critical_topics=critical,
-            overall_health_score=float(m.get("overall_health_score", 70)),
-            top_insight=m.get("top_insight", ""),
-            action_summary=m.get("action_summary", []),
-        )
 
     raw = chat(system_prompt, user_prompt, temperature=0.3)
     parsed = parse_json_response(raw)

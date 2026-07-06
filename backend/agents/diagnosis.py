@@ -75,7 +75,26 @@ async def run_diagnosis(student_name: str) -> DiagnosisResult:
 
     student_id = student["student_id"]
 
-    # 2. Retrieve quiz evidence from RAG
+    # 2. Get raw quiz scores for structured data
+    quiz_scores = _get_quiz_scores(student_id)
+
+    # 3. Short-circuit in mock mode — skip RAG/LLM entirely
+    if MOCK_MODE:
+        m = get_mock_response("diagnosis")
+        return DiagnosisResult(
+            student_id=student_id,
+            student_name=student_name,
+            batch=student["batch"],
+            attendance_pct=student["attendance_pct"],
+            weak_topic=m["weak_topic"],
+            evidence=m["evidence"],
+            quiz_scores=quiz_scores,
+            confidence=float(m["confidence"]),
+            reasoning=m["reasoning"],
+            risk_level=m["risk_level"],
+        )
+
+    # 4. Retrieve quiz evidence from RAG (only in live mode)
     quiz_chunks = retrieve(
         query=f"quiz scores performance results for student {student_name} {student_id}",
         source_filter="quiz_results",
@@ -83,7 +102,7 @@ async def run_diagnosis(student_name: str) -> DiagnosisResult:
         n=8,
     )
 
-    # 3. Retrieve video engagement evidence
+    # 5. Retrieve video engagement evidence
     video_chunks = retrieve(
         query=f"video engagement lesson completion for student {student_name} {student_id}",
         source_filter="video_engagement",
@@ -91,10 +110,7 @@ async def run_diagnosis(student_name: str) -> DiagnosisResult:
         n=6,
     )
 
-    # 4. Get raw quiz scores for structured data
-    quiz_scores = _get_quiz_scores(student_id)
-
-    # 5. Build context and call LLM
+    # 6. Build context and call LLM
     context = "\n".join([
         "=== Quiz Performance ===",
         *quiz_chunks,
@@ -129,21 +145,6 @@ Confidence guide:
 - medium (0.65-0.84): Clear quiz failure but limited other evidence
 - low (below 0.65): Borderline or inconclusive data
 """
-
-    if MOCK_MODE:
-        m = get_mock_response("diagnosis")
-        return DiagnosisResult(
-            student_id=student_id,
-            student_name=student_name,
-            batch=student["batch"],
-            attendance_pct=student["attendance_pct"],
-            weak_topic=m["weak_topic"],
-            evidence=m["evidence"],
-            quiz_scores=quiz_scores,
-            confidence=float(m["confidence"]),
-            reasoning=m["reasoning"],
-            risk_level=m["risk_level"],
-        )
 
     raw = chat(system_prompt, user_prompt, temperature=0.2)
     parsed = parse_json_response(raw)

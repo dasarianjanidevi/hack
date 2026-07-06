@@ -17,105 +17,153 @@ interface Props {
   onSelect: (key: string) => void;
 }
 
-const StatusIcon = ({ status, color }: { status: StepStatus; color: string }) => {
+const StatusDot = ({ status, color }: { status: StepStatus; color: string }) => {
   if (status === "running") {
     return (
-      <div className="w-5 h-5 rounded-full border-2 border-transparent flex-shrink-0 animate-spin-ring"
-        style={{ borderTopColor: color, borderRightColor: `${color}44` }} />
+      <div
+        style={{
+          width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+          border: `2px solid ${color}33`,
+          borderTopColor: color,
+          animation: "spin-ring 0.9s linear infinite",
+        }}
+      />
     );
   }
   if (status === "done") {
     return (
-      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{ background: `${color}22`, border: `1.5px solid ${color}` }}>
-        <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
-          <path d="M2 6l3 3 5-5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <div style={{
+        width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+        background: `${color}18`, border: `1.5px solid ${color}`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
     );
   }
   if (status === "error") {
     return (
-      <div className="w-5 h-5 rounded-full bg-red-500/20 border border-red-500 flex items-center justify-center flex-shrink-0">
-        <span className="text-red-400 text-xs font-bold">!</span>
-      </div>
+      <div style={{
+        width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+        background: "rgba(239,68,68,0.15)", border: "1.5px solid #ef4444",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 10, fontWeight: 700, color: "#ef4444",
+      }}>!</div>
     );
   }
   return (
-    <div className="w-5 h-5 rounded-full bg-white/6 border border-white/12 flex-shrink-0" />
+    <div style={{
+      width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+      background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.1)",
+    }} />
   );
 };
 
 export default function AgentTimeline({ steps, stepStates, activeTab, onSelect }: Props) {
   return (
-    <div className="space-y-1">
-      <div className="px-2 mb-3">
-        <p className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Agent Pipeline</p>
+    <div>
+      {/* Header */}
+      <div style={{ padding: "0 8px 14px", marginBottom: 4 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.25)" }}>
+          Agent Pipeline
+        </p>
       </div>
-      {steps.map((step, i) => {
-        const state = stepStates[step.key];
-        const isActive = activeTab === step.key;
-        const isDone = state.status === "done";
-        const isRunning = state.status === "running";
 
-        return (
-          <div key={step.key} className="relative">
-            {/* Connector line */}
-            {i < steps.length - 1 && (
-              <div
-                className="absolute left-[22px] top-[38px] w-px h-[calc(100%-4px)]"
-                style={{ background: isDone ? `${step.color}40` : "rgba(255,255,255,0.06)" }}
-              />
-            )}
+      {/* Steps */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {steps.map((step, i) => {
+          const state = stepStates[step.key];
+          const isActive = activeTab === step.key;
+          const isDone = state.status === "done";
+          const isRunning = state.status === "running";
+          const isClickable = isDone || isRunning;
 
-            <button
-              onClick={() => isDone || isRunning ? onSelect(step.key) : null}
-              disabled={state.status === "pending"}
-              className="w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 disabled:cursor-default group"
-              style={{
-                background: isActive
-                  ? `${step.color}14`
-                  : isRunning
-                  ? `${step.color}08`
-                  : "transparent",
-                border: isActive
-                  ? `1px solid ${step.color}35`
-                  : "1px solid transparent",
-              }}
-            >
-              <div className="mt-0.5">
-                <StatusIcon status={state.status} color={step.color} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm">{step.icon}</span>
-                  <span
-                    className="text-sm font-medium truncate"
-                    style={{
+          return (
+            <div key={step.key} style={{ position: "relative" }}>
+              {/* Connector line */}
+              {i < steps.length - 1 && (
+                <div style={{
+                  position: "absolute",
+                  left: 17, top: 34, width: 1,
+                  height: "calc(100% + 2px)",
+                  background: isDone ? `${step.color}35` : "rgba(255,255,255,0.05)",
+                  transition: "background 0.3s ease",
+                }} />
+              )}
+
+              <button
+                onClick={() => isClickable ? onSelect(step.key) : null}
+                disabled={!isClickable}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "9px 10px",
+                  borderRadius: 10,
+                  textAlign: "left",
+                  cursor: isClickable ? "pointer" : "default",
+                  border: "1px solid",
+                  borderColor: isActive ? `${step.color}35` : "transparent",
+                  background: isActive
+                    ? `${step.color}12`
+                    : isRunning
+                    ? `${step.color}07`
+                    : "transparent",
+                  transition: "all 0.18s ease",
+                  outline: "none",
+                }}
+                onMouseEnter={(e) => {
+                  if (isClickable && !isActive) {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = isRunning ? `${step.color}07` : "transparent";
+                  }
+                }}
+              >
+                {/* Status indicator */}
+                <StatusDot status={state.status} color={step.color} />
+
+                {/* Labels */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 1 }}>
+                    <span style={{ fontSize: 13 }}>{step.icon}</span>
+                    <span style={{
+                      fontSize: 13, fontWeight: 500,
                       color: isActive
                         ? step.color
                         : isDone
-                        ? "rgba(255,255,255,0.8)"
+                        ? "rgba(255,255,255,0.78)"
                         : isRunning
                         ? step.color
-                        : "rgba(255,255,255,0.3)",
-                    }}
-                  >
-                    {step.label}
-                  </span>
-                  {isRunning && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
-                      style={{ background: `${step.color}20`, color: step.color }}>
-                      Live
-                    </span>
-                  )}
+                        : "rgba(255,255,255,0.28)",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      transition: "color 0.2s ease",
+                    }}>{step.label}</span>
+                    {isRunning && (
+                      <span style={{
+                        fontSize: 9, fontWeight: 600, padding: "2px 6px", borderRadius: 99,
+                        background: `${step.color}20`, color: step.color,
+                        letterSpacing: "0.05em", textTransform: "uppercase",
+                      }}>Live</span>
+                    )}
+                  </div>
+                  <p style={{
+                    fontSize: 11, color: "rgba(255,255,255,0.22)",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    lineHeight: 1.4,
+                  }}>{step.desc}</p>
                 </div>
-                <p className="text-[11px] text-white/25 mt-0.5 leading-tight truncate">{step.desc}</p>
-              </div>
-            </button>
-          </div>
-        );
-      })}
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

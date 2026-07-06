@@ -9,7 +9,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 
-import chromadb
+try:
+    import chromadb
+    _CHROMADB_AVAILABLE = True
+except ImportError:
+    chromadb = None  # type: ignore
+    _CHROMADB_AVAILABLE = False
 
 CHROMA_DB_PATH = os.environ.get("CHROMA_DB_PATH", "./chroma_db")
 if not os.path.isabs(CHROMA_DB_PATH):
@@ -23,6 +28,8 @@ _collection = None
 
 def _get_collection():
     global _client, _collection
+    if not _CHROMADB_AVAILABLE:
+        raise RuntimeError("chromadb is not installed. Run: pip install chromadb")
     if _collection is None:
         _client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
         _collection = _client.get_collection(COLLECTION_NAME)

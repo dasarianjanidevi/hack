@@ -8,22 +8,24 @@ interface Props {
 }
 
 const SPEAKER_CONFIG: Record<string, { color: string; bg: string; side: "left" | "right" }> = {
-  "Diagnosis Agent": { color: "#3b82f6", bg: "rgba(59,130,246,0.1)", side: "left" },
-  "Critic Agent": { color: "#8b5cf6", bg: "rgba(139,92,246,0.1)", side: "right" },
+  "Diagnosis Agent": { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", side: "left" },
+  "Critic Agent":    { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", side: "right" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  diagnosis_claim: "Initial Claim",
-  critic_challenge: "Challenging",
-  diagnosis_update: "Updated Claim",
-  critic_approve: "Verdict",
-  statement: "Note",
+  diagnosis_claim:  "Claim",
+  critic_challenge: "Challenge",
+  diagnosis_update: "Updated",
+  critic_approve:   "Verdict",
+  statement:        "Note",
 };
 
 function parseBold(text: string) {
   const parts = text.split(/\*\*(.*?)\*\*/g);
   return parts.map((part, i) =>
-    i % 2 === 1 ? <strong key={i} className="font-semibold text-white">{part}</strong> : part
+    i % 2 === 1
+      ? <strong key={i} style={{ fontWeight: 600, color: "rgba(255,255,255,0.9)" }}>{part}</strong>
+      : part
   );
 }
 
@@ -35,68 +37,86 @@ export default function ConversationPanel({ messages }: Props) {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/6 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-          <p className="text-xs font-semibold text-white/70 uppercase tracking-wider">Agent Conversation</p>
+      <div style={{
+        padding: "16px 18px 14px",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        flexShrink: 0,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa", animation: "pulse-dot 1.8s ease-in-out infinite" }} />
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+            Agent Dialogue
+          </p>
         </div>
-        <p className="text-[11px] text-white/30 mt-0.5">Diagnosis ↔ Critic live debate</p>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>
+          Diagnosis ↔ Critic live debate
+        </p>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 14px", display: "flex", flexDirection: "column", gap: 14 }}>
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-            <div className="w-10 h-10 rounded-full bg-white/4 border border-white/8 flex items-center justify-center text-lg mb-3">
-              💬
-            </div>
-            <p className="text-xs text-white/25 leading-relaxed">
-              Agent conversation will<br />appear here in real time
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "32px 16px" }}>
+            <div style={{
+              width: 42, height: 42, borderRadius: "50%",
+              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 18, marginBottom: 12,
+            }}>💬</div>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", lineHeight: 1.7 }}>
+              Agent dialogue will<br />appear here in real time
             </p>
           </div>
         ) : (
           messages.map((msg, i) => {
-            const config = SPEAKER_CONFIG[msg.speaker] || { color: "#94a3b8", bg: "rgba(148,163,184,0.1)", side: "left" as const };
-            const isRight = config.side === "right";
+            const cfg = SPEAKER_CONFIG[msg.speaker] || { color: "#94a3b8", bg: "rgba(148,163,184,0.08)", side: "left" as const };
+            const isRight = cfg.side === "right";
 
             return (
               <div
                 key={i}
                 className="animate-fade-slide-up"
-                style={{ animationDelay: `${i * 0.05}s` }}
+                style={{ animationDelay: `${i * 0.04}s` }}
               >
-                {/* Speaker label */}
-                <div className={`flex items-center gap-1.5 mb-1 ${isRight ? "flex-row-reverse" : ""}`}>
-                  <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                    style={{ background: config.color, color: "white" }}
-                  >
+                {/* Speaker row */}
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  flexDirection: isRight ? "row-reverse" : "row",
+                  marginBottom: 5,
+                }}>
+                  {/* Avatar */}
+                  <div style={{
+                    width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
+                    background: cfg.color, color: "white",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 9, fontWeight: 700,
+                  }}>
                     {msg.speaker === "Diagnosis Agent" ? "D" : "C"}
                   </div>
-                  <span className="text-[10px] font-medium" style={{ color: config.color }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: cfg.color }}>
                     {msg.speaker.replace(" Agent", "")}
                   </span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full"
-                    style={{ background: `${config.color}18`, color: config.color }}>
+                  <span style={{
+                    fontSize: 9, fontWeight: 500, padding: "2px 6px", borderRadius: 99,
+                    background: `${cfg.color}15`, color: cfg.color, letterSpacing: "0.04em",
+                  }}>
                     {TYPE_LABELS[msg.message_type] || "Note"}
                   </span>
                 </div>
 
                 {/* Bubble */}
-                <div className={isRight ? "ml-4" : "mr-4"}>
-                  <div
-                    className="p-2.5 rounded-xl text-[11px] leading-relaxed"
-                    style={{
-                      background: config.bg,
-                      border: `1px solid ${config.color}30`,
-                      borderRadius: isRight
-                        ? "12px 4px 12px 12px"
-                        : "4px 12px 12px 12px",
-                      color: "rgba(255,255,255,0.75)",
-                    }}
-                  >
+                <div style={{ [isRight ? "paddingLeft" : "paddingRight"]: 28 }}>
+                  <div style={{
+                    padding: "10px 13px",
+                    background: cfg.bg,
+                    border: `1px solid ${cfg.color}25`,
+                    borderRadius: isRight ? "10px 3px 10px 10px" : "3px 10px 10px 10px",
+                    fontSize: 12, lineHeight: 1.65,
+                    color: "rgba(255,255,255,0.68)",
+                  }}>
                     {parseBold(msg.message)}
                   </div>
                 </div>
@@ -109,8 +129,13 @@ export default function ConversationPanel({ messages }: Props) {
 
       {/* Footer */}
       {messages.length > 0 && (
-        <div className="px-4 py-2 border-t border-white/6 flex-shrink-0">
-          <p className="text-[10px] text-white/20 text-center">{messages.length} messages exchanged</p>
+        <div style={{
+          padding: "10px 18px", borderTop: "1px solid rgba(255,255,255,0.04)",
+          flexShrink: 0, textAlign: "center",
+        }}>
+          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.18)" }}>
+            {messages.length} messages exchanged
+          </p>
         </div>
       )}
     </div>

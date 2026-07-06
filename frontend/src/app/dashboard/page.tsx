@@ -50,8 +50,7 @@ function DashboardContent() {
     if (started) return;
     setStarted(true);
 
-    const url = `${API_BASE}/api/run/stream`;
-    fetch(url, {
+    fetch(`${API_BASE}/api/run/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_name: studentName }),
@@ -93,9 +92,9 @@ function DashboardContent() {
       setConversation((prev) => [
         ...prev,
         {
-          speaker: (data as {speaker:string;message:string;message_type:string}).speaker,
-          message: (data as {speaker:string;message:string;message_type:string}).message,
-          message_type: (data as {speaker:string;message:string;message_type:string}).message_type,
+          speaker: (data as { speaker: string; message: string; message_type: string }).speaker,
+          message: (data as { speaker: string; message: string; message_type: string }).message,
+          message_type: (data as { speaker: string; message: string; message_type: string }).message_type,
           timestamp: Date.now(),
         },
       ]);
@@ -109,9 +108,7 @@ function DashboardContent() {
       [step]: { status: status as StepStatus, data: data ?? null, error: error ?? null },
     }));
 
-    if (status === "done") {
-      setActiveTab(step);
-    }
+    if (status === "done") setActiveTab(step);
   };
 
   const completedCount = Object.values(steps).filter((s) => s.status === "done").length;
@@ -119,57 +116,94 @@ function DashboardContent() {
 
   return (
     <div className="mesh-bg min-h-screen flex flex-col">
-      {/* Top Bar */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/6 sticky top-0 z-30 backdrop-blur-xl bg-[#070b14]/80">
-        <div className="flex items-center gap-3">
-          <a href="/" className="flex items-center gap-2 text-white/60 hover:text-white/90 text-sm transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+      {/* ── Top Bar ─────────────────────────────────────────────────── */}
+      <header style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 28px",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        position: "sticky", top: 0, zIndex: 30,
+        backdropFilter: "blur(20px)",
+        background: "rgba(5,8,15,0.88)",
+        flexShrink: 0,
+      }}>
+        {/* Left */}
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <a href="/" style={{
+            display: "flex", alignItems: "center", gap: 6,
+            color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 500,
+            textDecoration: "none", transition: "color 0.2s",
+          }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.8)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+          >
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back
           </a>
-          <span className="text-white/20">|</span>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">E</div>
-            <span className="font-semibold text-sm text-white/80">EduOS AI</span>
+          <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 8,
+              background: "linear-gradient(135deg,#3b82f6,#7c3aed)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 13, fontWeight: 700, color: "white",
+            }}>E</div>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>EduOS AI</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-white/50">
-            Analyzing: <span className="text-white font-medium">{studentName}</span>
-          </div>
+        {/* Center — student name */}
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+          Analyzing:{" "}
+          <span style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>{studentName}</span>
+        </div>
+
+        {/* Right — status */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {/* Step counter */}
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontVariantNumeric: "tabular-nums" }}>
+            {completedCount}/{STEPS.length} agents
+          </span>
+
           {completed ? (
-            <span className="flex items-center gap-1.5 text-xs text-green-400 bg-green-400/10 border border-green-400/25 px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <span className="badge badge-green">
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80" }} />
               Pipeline Complete
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs text-blue-400 bg-blue-400/10 border border-blue-400/25 px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              Running · {completedCount}/{STEPS.length}
+            <span className="badge badge-blue">
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#60a5fa", animation: "pulse-dot 1.6s ease-in-out infinite" }} />
+              Running · {progress}%
             </span>
           )}
         </div>
       </header>
 
-      {/* Progress Bar */}
-      <div className="progress-bar rounded-none">
+      {/* ── Progress bar ─────────────────────────────────────────────── */}
+      <div className="progress-bar" style={{ borderRadius: 0 }}>
         <div
           className="progress-fill"
           style={{
             width: `${progress}%`,
             background: completed
               ? "linear-gradient(90deg,#10b981,#34d399)"
-              : "linear-gradient(90deg,#3b82f6,#8b5cf6)",
+              : "linear-gradient(90deg,#3b82f6,#8b5cf6,#ec4899)",
           }}
         />
       </div>
 
-      {/* Main layout */}
-      <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 73px)" }}>
-        {/* Left — Agent Timeline */}
-        <aside className="w-64 flex-shrink-0 border-r border-white/6 overflow-y-auto p-4">
+      {/* ── Three-column Layout ──────────────────────────────────────── */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", height: "calc(100vh - 65px)" }}>
+
+        {/* Left — Timeline sidebar */}
+        <aside style={{
+          width: 240, flexShrink: 0,
+          borderRight: "1px solid rgba(255,255,255,0.05)",
+          overflowY: "auto", padding: "20px 12px",
+          background: "rgba(10,15,26,0.4)",
+        }}>
           <AgentTimeline
             steps={STEPS}
             stepStates={steps}
@@ -178,8 +212,8 @@ function DashboardContent() {
           />
         </aside>
 
-        {/* Center — Result Panel */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* Center — Results */}
+        <main style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
           <ResultsPanel
             steps={STEPS}
             stepStates={steps}
@@ -189,8 +223,13 @@ function DashboardContent() {
           />
         </main>
 
-        {/* Right — Agent Conversation */}
-        <aside className="w-72 flex-shrink-0 border-l border-white/6 overflow-y-auto">
+        {/* Right — Conversation */}
+        <aside style={{
+          width: 288, flexShrink: 0,
+          borderLeft: "1px solid rgba(255,255,255,0.05)",
+          overflowY: "auto",
+          background: "rgba(10,15,26,0.4)",
+        }}>
           <ConversationPanel messages={conversation} />
         </aside>
       </div>
@@ -202,7 +241,15 @@ export default function DashboardPage() {
   return (
     <Suspense fallback={
       <div className="mesh-bg min-h-screen flex items-center justify-center">
-        <div className="text-white/40 text-sm animate-pulse">Loading pipeline...</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: "50%",
+            border: "2px solid rgba(59,130,246,0.2)",
+            borderTop: "2px solid #3b82f6",
+            animation: "spin-ring 0.9s linear infinite",
+          }} />
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>Loading pipeline...</p>
+        </div>
       </div>
     }>
       <DashboardContent />

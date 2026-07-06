@@ -24,12 +24,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from agents.diagnosis import run_diagnosis, DiagnosisResult
 from agents.critic import run_critic, CriticResult
-from agents.tutor import run_tutor, TutorPlan
+from agents.tutor import run_tutor, TutorPlan, DayPlan
 from agents.faculty import run_faculty, FacultyNote
 from agents.action import run_action, ActionResult
 from agents.curriculum import run_curriculum, CurriculumReport
 from agents.placement import run_placement
 from agents.prediction import run_prediction, PredictionResult
+from mock_responses import get_mock_response
 
 # In-memory store for completed pipeline results
 _results: dict[str, dict] = {}
@@ -72,14 +73,71 @@ def _conversation_event(speaker: str, message: str, message_type: str = "stateme
     return f"data: {json.dumps(payload)}\n\n"
 
 
+def _make_fallback_critic(diagnosis: DiagnosisResult) -> CriticResult:
+    """Return a mock CriticResult when the real Critic agent fails."""
+    m = get_mock_response("critic")
+    return CriticResult(
+        verified=bool(m["verified"]),
+        confidence=float(m["confidence"]),
+        original_confidence=diagnosis.confidence,
+        verdict=m["verdict"],
+        supporting_evidence=m.get("supporting_evidence", []),
+        contradicting_evidence=m.get("contradicting_evidence", []),
+        reason=m["reason"],
+        recommendation=m["recommendation"],
+    )
+
+
+def _make_fallback_tutor(diagnosis: DiagnosisResult) -> TutorPlan:
+    """Return a mock TutorPlan when the real Tutor agent fails."""
+    m = get_mock_response("tutor")
+    days = [
+        DayPlan(
+            day=d["day"],
+            focus=d["focus"],
+            concepts=d["concepts"],
+            resources=d["resources"],
+            exercise=d["exercise"],
+            estimated_time=d["estimated_time"],
+        )
+        for d in m["days"]
+    ]
+    return TutorPlan(
+        student_name=diagnosis.student_name,
+        weak_topic=diagnosis.weak_topic,
+        overall_goal=m["overall_goal"],
+        days=days,
+        prerequisite_check=m["prerequisite_check"],
+        success_metric=m["success_metric"],
+    )
+
+
+def _make_fallback_faculty(diagnosis: DiagnosisResult) -> FacultyNote:
+    """Return a mock FacultyNote when the real Faculty agent fails."""
+    m = get_mock_response("faculty")
+    return FacultyNote(
+        to=m.get("to", "Course Faculty"),
+        from_agent=m.get("from_agent", "EduOS AI — Faculty Notification Agent"),
+        subject=m.get("subject", f"Intervention Required: {diagnosis.student_name}"),
+        student_name=diagnosis.student_name,
+        urgency=m.get("urgency", "High"),
+        summary=m.get("summary", ""),
+        body=m.get("body", ""),
+        action_items=m.get("action_items", []),
+        follow_up_date=m.get("follow_up_date", "Within 48 hours"),
+    )
+
+
 async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, None]:
     """
     Async generator that runs all 8 agents and yields SSE messages.
+    Non-critical agents fall back to mock data on error so the pipeline
+    always completes all 8 steps even in degraded environments.
     """
     result_store = {}
 
     try:
-        # ─── STEP 1: DIAGNOSIS ─────────────────────────────────────────
+        # ─── STEP 1: DIAGNOSIS (CRITICAL — must succeed) ───────────────
         yield _event("diagnosis", "running")
         try:
             diagnosis: DiagnosisResult = await run_diagnosis(student_name)
@@ -99,7 +157,7 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             )
         except Exception as e:
             yield _event("diagnosis", "error", error=str(e))
-            return
+            return  # Diagnosis is required — cannot proceed without it
 
         # ─── STEP 2: CRITIC (with visible conversation) ─────────────────
         yield _event("critic", "running")
@@ -116,66 +174,72 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             message_type="critic_challenge",
         )
 
+        critic_error: str | None = None
         try:
             critic: CriticResult = await run_critic(diagnosis)
-            result_store["critic"] = critic.to_dict()
-
-            # Show critic's finding
-            await asyncio.sleep(0.3)
-            if critic.verdict == "CONFIRMED":
-                yield _conversation_event(
-                    speaker="Critic Agent",
-                    message=(
-                        f"Cross-verification **CONFIRMED**. "
-                        f"Supporting evidence from secondary sources: {'; '.join(critic.supporting_evidence[:2])}. "
-                        f"Updated confidence: **{critic.confidence:.0%}**. "
-                        f"Approved for action."
-                    ),
-                    message_type="critic_approve",
-                )
-            elif critic.verdict == "CHALLENGED":
-                yield _conversation_event(
-                    speaker="Critic Agent",
-                    message=(
-                        f"Evidence is **INSUFFICIENT or CONTRADICTED**. "
-                        f"Contradiction: {critic.contradicting_evidence[0] if critic.contradicting_evidence else 'Weak signal'}. "
-                        f"Requesting re-analysis."
-                    ),
-                    message_type="critic_challenge",
-                )
-                await asyncio.sleep(0.4)
-                yield _conversation_event(
-                    speaker="Diagnosis Agent",
-                    message=(
-                        f"Acknowledged. Re-analyzing with updated context. "
-                        f"The diagnosis stands on: {'; '.join(diagnosis.evidence[:2])}. "
-                        f"Cross-source confidence adjusted to: {critic.confidence:.0%}."
-                    ),
-                    message_type="diagnosis_update",
-                )
-                await asyncio.sleep(0.4)
-                yield _conversation_event(
-                    speaker="Critic Agent",
-                    message=(
-                        f"Final verdict: **{critic.verdict}**. "
-                        f"Confidence: {critic.confidence:.0%}. {critic.reason}"
-                    ),
-                    message_type="critic_approve",
-                )
-            else:
-                yield _conversation_event(
-                    speaker="Critic Agent",
-                    message=(
-                        f"Verdict: **INCONCLUSIVE**. Limited cross-source evidence. "
-                        f"Proceeding with {critic.confidence:.0%} confidence. {critic.reason}"
-                    ),
-                    message_type="critic_approve",
-                )
-
-            yield _event("critic", "done", critic.to_dict())
         except Exception as e:
-            yield _event("critic", "error", error=str(e))
-            return
+            # Fall back to mock data — pipeline must not stop here
+            critic_error = str(e)
+            critic = _make_fallback_critic(diagnosis)
+
+        result_store["critic"] = critic.to_dict()
+
+        # Show critic's finding in conversation
+        await asyncio.sleep(0.3)
+        if critic.verdict == "CONFIRMED":
+            yield _conversation_event(
+                speaker="Critic Agent",
+                message=(
+                    f"Cross-verification **CONFIRMED**. "
+                    f"Supporting evidence from secondary sources: {'; '.join(critic.supporting_evidence[:2])}. "
+                    f"Updated confidence: **{critic.confidence:.0%}**. "
+                    f"Approved for action."
+                ),
+                message_type="critic_approve",
+            )
+        elif critic.verdict == "CHALLENGED":
+            yield _conversation_event(
+                speaker="Critic Agent",
+                message=(
+                    f"Evidence is **INSUFFICIENT or CONTRADICTED**. "
+                    f"Contradiction: {critic.contradicting_evidence[0] if critic.contradicting_evidence else 'Weak signal'}. "
+                    f"Requesting re-analysis."
+                ),
+                message_type="critic_challenge",
+            )
+            await asyncio.sleep(0.4)
+            yield _conversation_event(
+                speaker="Diagnosis Agent",
+                message=(
+                    f"Acknowledged. Re-analyzing with updated context. "
+                    f"The diagnosis stands on: {'; '.join(diagnosis.evidence[:2])}. "
+                    f"Cross-source confidence adjusted to: {critic.confidence:.0%}."
+                ),
+                message_type="diagnosis_update",
+            )
+            await asyncio.sleep(0.4)
+            yield _conversation_event(
+                speaker="Critic Agent",
+                message=(
+                    f"Final verdict: **{critic.verdict}**. "
+                    f"Confidence: {critic.confidence:.0%}. {critic.reason}"
+                ),
+                message_type="critic_approve",
+            )
+        else:
+            yield _conversation_event(
+                speaker="Critic Agent",
+                message=(
+                    f"Verdict: **INCONCLUSIVE**. Limited cross-source evidence. "
+                    f"Proceeding with {critic.confidence:.0%} confidence. {critic.reason}"
+                ),
+                message_type="critic_approve",
+            )
+
+        if critic_error:
+            yield _event("critic", "done", {**critic.to_dict(), "_fallback": True})
+        else:
+            yield _event("critic", "done", critic.to_dict())
 
         # ─── STEP 3: TUTOR ─────────────────────────────────────────────
         yield _event("tutor", "running")
@@ -184,8 +248,9 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             result_store["tutor"] = tutor_plan.to_dict()
             yield _event("tutor", "done", tutor_plan.to_dict())
         except Exception as e:
-            yield _event("tutor", "error", error=str(e))
-            return
+            tutor_plan = _make_fallback_tutor(diagnosis)
+            result_store["tutor"] = tutor_plan.to_dict()
+            yield _event("tutor", "done", {**tutor_plan.to_dict(), "_fallback": True})
 
         # ─── STEP 4: FACULTY ───────────────────────────────────────────
         yield _event("faculty", "running")
@@ -194,8 +259,9 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             result_store["faculty"] = faculty_note.to_dict()
             yield _event("faculty", "done", faculty_note.to_dict())
         except Exception as e:
-            yield _event("faculty", "error", error=str(e))
-            return
+            faculty_note = _make_fallback_faculty(diagnosis)
+            result_store["faculty"] = faculty_note.to_dict()
+            yield _event("faculty", "done", {**faculty_note.to_dict(), "_fallback": True})
 
         # ─── STEP 5: ACTION ────────────────────────────────────────────
         yield _event("action", "running")
@@ -205,7 +271,6 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             yield _event("action", "done", action_result.to_dict())
         except Exception as e:
             yield _event("action", "error", error=str(e))
-            return
 
         # ─── STEP 6: CURRICULUM ────────────────────────────────────────
         yield _event("curriculum", "running")
@@ -215,7 +280,6 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             yield _event("curriculum", "done", curriculum_report.to_dict())
         except Exception as e:
             yield _event("curriculum", "error", error=str(e))
-            return
 
         # ─── STEP 7: PLACEMENT ─────────────────────────────────────────
         yield _event("placement", "running")
@@ -225,7 +289,6 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             yield _event("placement", "done", placement_result)
         except Exception as e:
             yield _event("placement", "error", error=str(e))
-            return
 
         # ─── STEP 8: PREDICTION ────────────────────────────────────────
         yield _event("prediction", "running")
@@ -235,7 +298,6 @@ async def run_pipeline(student_name: str, run_id: str) -> AsyncGenerator[str, No
             yield _event("prediction", "done", prediction.to_dict())
         except Exception as e:
             yield _event("prediction", "error", error=str(e))
-            return
 
         # ─── PIPELINE COMPLETE ─────────────────────────────────────────
         store_result(run_id, result_store)

@@ -280,6 +280,112 @@ Return ONLY the JSON array."""
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
+import random
+
+
+class GenerateDataRequest(BaseModel):
+    student_id: str
+    month: int
+    year: int
+    performance_level: Optional[str] = "auto"  # "strong" | "average" | "weak" | "auto"
+
+
+@router.post("/generate")
+async def generate_student_data(req: GenerateDataRequest):
+    """
+    Auto-generate realistic monthly progress data for a student and save it.
+    Simulates: videos watched, coding completions, quiz scores based on
+    attendance and optional performance level hint.
+    """
+    student = _get_student(req.student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail=f"Student '{req.student_id}' not found.")
+
+    # Determine base engagement from attendance
+    try:
+        attendance = float(student.get("attendance_pct", 75))
+    except (ValueError, TypeError):
+        attendance = 75.0
+
+    # Override with explicit performance level
+    level = req.performance_level or "auto"
+    if level == "strong":
+        base_score = random.uniform(78, 95)
+        video_prob = 0.95
+        c1_prob = 0.92
+        c2_prob = 0.88
+    elif level == "weak":
+        base_score = random.uniform(30, 58)
+        video_prob = 0.40
+        c1_prob = 0.35
+        c2_prob = 0.25
+    elif level == "average":
+        base_score = random.uniform(58, 78)
+        video_prob = 0.72
+        c1_prob = 0.65
+        c2_prob = 0.55
+    else:  # auto — derive from attendance
+        base_score = attendance * 0.82 + random.uniform(-8, 8)
+        base_score = max(20, min(98, base_score))
+        video_prob = min(0.97, attendance / 100 * 1.1)
+        c1_prob = video_prob * 0.88
+        c2_prob = c1_prob * 0.82
+
+    conn = get_connection()
+    generated = []
+    try:
+        for topic in TOPICS:
+            # Each topic gets slightly varied scores for realism
+            topic_variance = random.uniform(-12, 12)
+            quiz_score = round(max(0, min(100, base_score + topic_variance)), 1)
+            videos_done = random.random() < video_prob
+            # Coding done only if videos done (realistic dependency)
+            c1_done = videos_done and random.random() < c1_prob
+            c2_done = c1_done and random.random() < c2_prob
+            notes = ""
+
+            conn.execute(
+                """
+                INSERT INTO monthly_progress
+                    (student_id, month, year, topic, quiz_score, videos_completed,
+                     coding_part1, coding_part2, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(student_id, month, year, topic)
+                DO UPDATE SET
+                    quiz_score       = excluded.quiz_score,
+                    videos_completed = excluded.videos_completed,
+                    coding_part1     = excluded.coding_part1,
+                    coding_part2     = excluded.coding_part2,
+                    notes            = excluded.notes,
+                    created_at       = CURRENT_TIMESTAMP
+                """,
+                (
+                    req.student_id, req.month, req.year, topic,
+                    quiz_score, int(videos_done), int(c1_done), int(c2_done), notes,
+                ),
+            )
+            generated.append({
+                "topic": topic,
+                "quiz_score": quiz_score,
+                "videos_completed": videos_done,
+                "coding_part1": c1_done,
+                "coding_part2": c2_done,
+            })
+        conn.commit()
+    finally:
+        conn.close()
+
+    return {
+        "status": "generated",
+        "student_id": req.student_id,
+        "month": req.month,
+        "year": req.year,
+        "performance_level": level,
+        "rows_generated": len(generated),
+        "topics": generated,
+    }
+
+
 @router.get("/students")
 async def get_students():
     """List all students for the instructor dropdown."""

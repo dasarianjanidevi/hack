@@ -116,7 +116,7 @@ export default function HomePage() {
           <span className="badge badge-blue" style={{ fontSize: 11 }}>v1.0 · Hackathon</span>
         </div>
 
-        {/* Nav right: stats + add student */}
+        {/* Nav right: stats + portal links */}
         <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
           {STATS.map((s) => (
             <div key={s.label} style={{ textAlign: "center" }}>
@@ -124,6 +124,18 @@ export default function HomePage() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</div>
             </div>
           ))}
+          <Link href="/instructor" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "7px 16px", borderRadius: 8,
+            background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)",
+            color: "#c4b5fd", fontSize: 12, fontWeight: 600,
+            textDecoration: "none", transition: "all 0.2s ease",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.18)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.1)"; }}
+          >
+            👨‍🏫 Instructor Portal
+          </Link>
           <Link href="/students" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             padding: "7px 16px", borderRadius: 8,

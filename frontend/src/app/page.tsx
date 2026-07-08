@@ -159,7 +159,7 @@ export default function HomePage() {
 
         {/* ── Selector Card ────────────────────────────────────────────── */}
         <div
-          className="glass animate-fade-slide-up"
+          className="glass-premium animate-fade-slide-up"
           style={{ width: "100%", maxWidth: 460, padding: "32px", animationDelay: "0.24s" }}
         >
           {/* Card header */}

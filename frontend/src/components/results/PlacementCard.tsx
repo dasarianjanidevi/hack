@@ -6,6 +6,15 @@ interface UpskillItem { skill: string; priority: string; estimated_weeks: number
 const SEVERITY_COLOR: Record<string, string> = { Critical: "#ef4444", Moderate: "#f59e0b", Minor: "#10b981" };
 const PRIORITY_COLOR: Record<string, string> = { High: "#ef4444", Medium: "#f59e0b", Low: "#10b981" };
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 14,
+    }}>{children}</p>
+  );
+}
+
 export default function PlacementCard({ data }: Props) {
   const score = Number(data.placement_readiness_score);
   const ready = Boolean(data.ready_for_placement);
@@ -18,30 +27,30 @@ export default function PlacementCard({ data }: Props) {
   const scoreGlow = score >= 70 ? "badge-glow-green" : score >= 50 ? "badge-glow-amber" : "badge-glow-red";
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Score + Role */}
-      <div className={`glass-premium p-6 flex flex-col sm:flex-row items-center gap-6 transition-all ${scoreGlow}`} style={{ borderLeft: `4px solid ${scoreColor}` }}>
-        <div className="relative w-28 h-28 flex-shrink-0 filter drop-shadow-[0_0_8px_rgba(255,255,255,0.05)]">
-          <svg className="w-28 h-28 -rotate-90" viewBox="0 0 36 36">
+      <div className={`glass-premium ${scoreGlow}`} style={{ padding: "24px 26px", display: "flex", flexDirection: "row", alignItems: "center", gap: 24, borderLeft: `4px solid ${scoreColor}` }}>
+        <div style={{ position: "relative", width: 100, height: 100, flexShrink: 0 }}>
+          <svg style={{ width: 100, height: 100, transform: "rotate(-90deg)" }} viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="3.5" />
             <circle cx="18" cy="18" r="15.9" fill="none" stroke={scoreColor} strokeWidth="3.5"
               strokeDasharray={`${score} ${100 - score}`} strokeLinecap="round"
               style={{ transition: "stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1)" }} />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-extrabold" style={{ color: scoreColor }}>{score}</span>
-            <span className="text-[10px] text-white/30 font-bold"> readiness</span>
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: scoreColor }}>{score}</span>
+            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>readiness</span>
           </div>
         </div>
-        <div className="flex-1 text-center sm:text-left">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Placement Target</p>
-          <p className="text-2xl font-extrabold tracking-tight text-white/90">{String(data.target_role)}</p>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>Placement Target</p>
+          <p style={{ fontSize: 20, fontWeight: 850, color: "rgba(255,255,255,0.9)", letterSpacing: "-0.02em" }}>{String(data.target_role)}</p>
           
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mt-3">
-            <span className={`badge ${ready ? "badge-green badge-glow-green" : "badge-red badge-glow-red"} font-bold text-xs px-3 py-1`}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginTop: 12 }}>
+            <span className={`badge ${ready ? "badge-green badge-glow-green" : "badge-red badge-glow-red"}`} style={{ fontWeight: 700, fontSize: 12 }}>
               {ready ? "✓ Ready for Placement" : "✗ Not Yet Ready"}
             </span>
-            <span className="badge bg-white/[0.03] border border-white/[0.08] text-white/70 font-semibold text-xs px-3 py-1">
+            <span className="badge" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 12 }}>
               {severity} Gap Severity
             </span>
           </div>
@@ -49,68 +58,71 @@ export default function PlacementCard({ data }: Props) {
       </div>
 
       {/* Skills grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="glass-premium p-5">
-          <p className="text-[10px] font-bold text-green-400/80 uppercase tracking-widest mb-3">✓ Matched Industry Skills</p>
-          <div className="flex flex-wrap gap-2">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="glass-premium" style={{ padding: "22px 20px" }}>
+          <SectionLabel>✓ Matched Industry Skills</SectionLabel>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {matched.map((s, i) => (
-              <span key={i} className="text-xs px-3 py-1.5 rounded-xl bg-green-500/10 text-green-300 border border-green-500/20 font-medium">
+              <span key={i} className="badge badge-green" style={{ fontSize: 12, fontWeight: 500, padding: "5px 12px" }}>
                 {s}
               </span>
             ))}
-            {matched.length === 0 && <p className="text-xs text-white/30 italic">No verified matching skills.</p>}
+            {matched.length === 0 && <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No verified matching skills.</p>}
           </div>
         </div>
-        <div className="glass-premium p-5">
-          <p className="text-[10px] font-bold text-red-400/80 uppercase tracking-widest mb-3">✗ Missing Critical Skills</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="glass-premium" style={{ padding: "22px 20px" }}>
+          <SectionLabel>✗ Missing Critical Skills</SectionLabel>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {missing.map((s, i) => (
-              <span key={i} className="text-xs px-3 py-1.5 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 font-medium">
+              <span key={i} className="badge badge-red" style={{ fontSize: 12, fontWeight: 500, padding: "5px 12px" }}>
                 {s}
               </span>
             ))}
             {niceToHave.map((s, i) => (
-              <span key={`nth-${i}`} className="text-xs px-3 py-1.5 rounded-xl bg-amber-500/5 text-amber-300/80 border border-amber-500/15 font-medium">
+              <span key={`nth-${i}`} className="badge badge-amber" style={{ fontSize: 12, fontWeight: 500, padding: "5px 12px" }}>
                 {s}
               </span>
             ))}
-            {missing.length === 0 && niceToHave.length === 0 && <p className="text-xs text-white/30 italic">No critical missing skills.</p>}
+            {missing.length === 0 && niceToHave.length === 0 && <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No critical missing skills.</p>}
           </div>
         </div>
       </div>
 
       {/* Key Insight */}
-      <div className="glass-premium p-4 flex items-start gap-3 border-l-4" style={{ borderColor: "#14b8a6", background: "rgba(20,184,166,0.04)" }}>
-        <span className="text-xl text-teal-400 mt-0.5">💡</span>
-        <p className="text-xs text-white/70 leading-relaxed font-medium">{String(data.key_insight)}</p>
+      <div className="glass-premium" style={{ padding: "18px 20px", display: "flex", alignItems: "flex-start", gap: 14, borderLeft: "3px solid #14b8a6", background: "rgba(20,184,166,0.04)" }}>
+        <span style={{ fontSize: 20, marginTop: 2 }}>💡</span>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.7 }}>{String(data.key_insight)}</p>
       </div>
 
       {/* Upskilling Plan */}
       {upskilling.length > 0 && (
-        <div className="glass-premium p-6">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Upskilling Roadmap & Action Plan</p>
-          <div className="space-y-3.5">
+        <div className="glass-premium" style={{ padding: "24px 24px" }}>
+          <SectionLabel>Upskilling Roadmap & Action Plan</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {upskilling.map((item, i) => (
-              <div key={i} className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] transition-all">
-                <span className="text-xs px-2.5 py-1 rounded font-bold uppercase flex-shrink-0 shadow"
-                  style={{ background: `${PRIORITY_COLOR[item.priority]}15`, color: PRIORITY_COLOR[item.priority], border: `1px solid ${PRIORITY_COLOR[item.priority]}30` }}>
+              <div key={i} style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 14, padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
+                  background: `${PRIORITY_COLOR[item.priority]}15`, color: PRIORITY_COLOR[item.priority],
+                  border: `1px solid ${PRIORITY_COLOR[item.priority]}30`, flexShrink: 0, marginTop: 2,
+                }}>
                   {item.priority}
                 </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-sm font-bold text-white/85">{item.skill}</p>
-                    <span className="text-xs font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded-lg">
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <p style={{ fontSize: 13.5, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>{item.skill}</p>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#14b8a6", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(20,184,166,0.2)", padding: "2px 8px", borderRadius: 6 }}>
                       ⏳ {item.estimated_weeks} Weeks
                     </span>
                   </div>
-                  <p className="text-xs text-white/60 leading-relaxed">{item.approach}</p>
+                  <p style={{ fontSize: 12.5, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{item.approach}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-5 pt-4 border-t border-white/[0.05] flex items-center justify-between">
-            <p className="text-xs text-white/60 font-semibold">
-              🎯 Estimated Placement Window: <span className="text-teal-400 font-extrabold">{String(data.placement_timeline)}</span>
+          <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,0.4)" }}>
+              🎯 Estimated Placement Window: <strong style={{ color: "#2dd4bf" }}>{String(data.placement_timeline)}</strong>
             </p>
           </div>
         </div>

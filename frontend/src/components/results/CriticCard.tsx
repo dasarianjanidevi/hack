@@ -3,10 +3,19 @@
 interface Props { data: Record<string, unknown>; studentName: string; }
 
 const VERDICT_CONFIG: Record<string, { color: string; bg: string; icon: string }> = {
-  CONFIRMED:    { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "✅" },
-  CHALLENGED:   { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", icon: "⚠️" },
-  INCONCLUSIVE: { color: "#94a3b8", bg: "rgba(148,163,184,0.1)", icon: "❓" },
+  CONFIRMED:    { color: "#10b981", bg: "rgba(16,185,129,0.08)",  icon: "✅" },
+  CHALLENGED:   { color: "#f59e0b", bg: "rgba(245,158,11,0.08)", icon: "⚠️" },
+  INCONCLUSIVE: { color: "#94a3b8", bg: "rgba(148,163,184,0.08)", icon: "❓" },
 };
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 14,
+    }}>{children}</p>
+  );
+}
 
 export default function CriticCard({ data }: Props) {
   const verdict = String(data.verdict || "CONFIRMED");
@@ -18,70 +27,80 @@ export default function CriticCard({ data }: Props) {
   const verdictGlow = verdict === "CONFIRMED" ? "badge-glow-green" : verdict === "CHALLENGED" ? "badge-glow-amber" : "badge-glow-purple";
 
   return (
-    <div className="space-y-6">
-      {/* Verdict Banner */}
-      <div className={`glass-premium p-6 flex items-start gap-5 transition-all ${verdictGlow}`}
-        style={{ borderColor: `${cfg.color}35`, background: `linear-gradient(135deg, ${cfg.bg}, rgba(10,15,26,0.9))` }}>
-        <span className="text-4xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">{cfg.icon}</span>
-        <div className="flex-1">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Critic Verdict</p>
-          <p className="text-2xl font-extrabold tracking-tight mb-2" style={{ color: cfg.color }}>{verdict}</p>
-          <p className="text-sm text-white/75 leading-relaxed">{String(data.reason)}</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Verdict Banner ─────────────────────────────────────────── */}
+      <div
+        className={`glass-premium ${verdictGlow}`}
+        style={{
+          padding: "24px 26px",
+          display: "flex", alignItems: "flex-start", gap: 20,
+          borderColor: `${cfg.color}30`,
+          background: `linear-gradient(135deg, ${cfg.bg}, rgba(10,15,26,0.9))`,
+        }}
+      >
+        <span style={{ fontSize: 38, lineHeight: 1 }}>{cfg.icon}</span>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+            Critic Verdict
+          </p>
+          <p style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", color: cfg.color, marginBottom: 10 }}>
+            {verdict}
+          </p>
+          <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.7 }}>
+            {String(data.reason)}
+          </p>
         </div>
       </div>
 
-      {/* Confidence Comparison */}
-      <div className="glass-premium p-6">
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Confidence Variance Check</p>
-        <div className="space-y-4">
-          <div className="p-3 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-            <div className="flex justify-between items-center text-xs mb-2">
-              <span className="text-white/50">Diagnosis Agent Claimed</span>
-              <span className="text-white/75 font-semibold">{origPct}%</span>
+      {/* ── Confidence Comparison ──────────────────────────────────── */}
+      <div className="glass-premium" style={{ padding: "24px 24px" }}>
+        <SectionLabel>📊 Confidence Variance Check</SectionLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, marginBottom: 10 }}>
+              <span style={{ color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>Diagnosis Agent Claimed</span>
+              <span style={{ color: "rgba(255,255,255,0.75)", fontWeight: 700 }}>{origPct}%</span>
             </div>
-            <div className="progress-bar rounded-full h-2">
-              <div className="progress-fill h-full rounded-full" style={{ width: `${origPct}%`, background: "linear-gradient(90deg, #3b82f6, #60a5fa)" }} />
+            <div className="progress-bar" style={{ borderRadius: 99, height: 6 }}>
+              <div className="progress-fill" style={{ width: `${origPct}%`, height: "100%", borderRadius: 99, background: "linear-gradient(90deg,#3b82f6,#60a5fa)" }} />
             </div>
           </div>
-          <div className="p-3 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-            <div className="flex justify-between items-center text-xs mb-2">
-              <span className="font-semibold" style={{ color: cfg.color }}>After Cross-Verification</span>
-              <span className="font-extrabold" style={{ color: cfg.color }}>{pct}%</span>
+          <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: `1px solid ${cfg.color}25` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, marginBottom: 10 }}>
+              <span style={{ color: cfg.color, fontWeight: 600 }}>After Cross-Verification</span>
+              <span style={{ color: cfg.color, fontWeight: 800 }}>{pct}%</span>
             </div>
-            <div className="progress-bar rounded-full h-2">
-              <div className="progress-fill transition-all duration-700 h-full rounded-full"
-                style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${cfg.color}, #ffffff)` }} />
+            <div className="progress-bar" style={{ borderRadius: 99, height: 6 }}>
+              <div className="progress-fill" style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: `linear-gradient(90deg,${cfg.color},#ffffff60)`, transition: "width 0.7s ease" }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Evidence Panels Grid */}
+      {/* ── Evidence Grid ──────────────────────────────────────────── */}
       {(supporting.length > 0 || contradicting.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Supporting Evidence */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {supporting.length > 0 && (
-            <div className="glass-premium p-5 border-l-4" style={{ borderLeftColor: "#10b981" }}>
-              <p className="text-[10px] font-bold text-green-400/80 uppercase tracking-widest mb-3">✓ Supporting Evidence</p>
-              <ul className="space-y-2.5">
+            <div className="glass-premium" style={{ padding: "22px 20px", borderLeft: "3px solid #10b981" }}>
+              <SectionLabel>✓ Supporting Evidence</SectionLabel>
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {supporting.map((e, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-xs text-white/75 leading-relaxed">
-                    <span className="text-green-400 font-bold flex-shrink-0 mt-0.5">✓</span>
+                  <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
+                    <span style={{ color: "#10b981", fontWeight: 800, flexShrink: 0, marginTop: 2 }}>✓</span>
                     {e}
                   </li>
                 ))}
               </ul>
             </div>
           )}
-
-          {/* Contradicting Evidence */}
           {contradicting.length > 0 && (
-            <div className="glass-premium p-5 border-l-4" style={{ borderLeftColor: "#f59e0b" }}>
-              <p className="text-[10px] font-bold text-amber-400/80 uppercase tracking-widest mb-3">⚡ Contradicting Evidence</p>
-              <ul className="space-y-2.5">
+            <div className="glass-premium" style={{ padding: "22px 20px", borderLeft: "3px solid #f59e0b" }}>
+              <SectionLabel>⚡ Contradicting Evidence</SectionLabel>
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {contradicting.map((e, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-xs text-white/75 leading-relaxed">
-                    <span className="text-amber-400 font-bold flex-shrink-0 mt-0.5">⚡</span>
+                  <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
+                    <span style={{ color: "#f59e0b", fontWeight: 800, flexShrink: 0, marginTop: 2 }}>⚡</span>
                     {e}
                   </li>
                 ))}
@@ -91,12 +110,19 @@ export default function CriticCard({ data }: Props) {
         </div>
       )}
 
-      {/* Recommendation */}
-      <div className="glass-premium p-5" style={{ background: `linear-gradient(135deg, ${cfg.color}08, rgba(10,15,26,0.6))`, borderColor: `${cfg.color}30` }}>
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Recommendation Directive</p>
-        <p className="text-sm font-semibold leading-relaxed" style={{ color: cfg.color }}>{String(data.recommendation)}</p>
+      {/* ── Recommendation ────────────────────────────────────────── */}
+      <div className="glass-premium" style={{
+        padding: "20px 22px",
+        background: `linear-gradient(135deg, ${cfg.color}08, rgba(10,15,26,0.6))`,
+        borderColor: `${cfg.color}28`,
+      }}>
+        <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+          Recommendation Directive
+        </p>
+        <p style={{ fontSize: 13.5, fontWeight: 600, color: cfg.color, lineHeight: 1.7 }}>
+          {String(data.recommendation)}
+        </p>
       </div>
     </div>
   );
 }
-

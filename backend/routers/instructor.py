@@ -8,6 +8,9 @@ Endpoints for the Instructor Dashboard:
   POST /api/instructor/report                          — generate AI analysis report
   GET  /api/instructor/report/{student_id}/{m}/{y}    — retrieve cached report
   GET  /api/instructor/compare/{student_id}/{m}/{y}   — compare with previous month
+
+Student Management (used by main router for student CRUD):
+  POST /api/students   — create a new student (writes to CSV)
 """
 import os
 import sys
@@ -19,7 +22,7 @@ from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from db import get_connection
 from llm_client import chat, MOCK_MODE

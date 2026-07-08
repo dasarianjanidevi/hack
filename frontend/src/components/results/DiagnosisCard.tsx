@@ -2,18 +2,28 @@
 
 interface Props { data: Record<string, unknown>; studentName: string; }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)",
+      marginBottom: 14,
+    }}>{children}</p>
+  );
+}
+
 function ConfidenceMeter({ value, label }: { value: number; label?: string }) {
   const pct = Math.round(value * 100);
   const cls = pct >= 80 ? "confidence-fill-high" : pct >= 60 ? "confidence-fill-medium" : "confidence-fill-low";
   const color = pct >= 80 ? "#10b981" : pct >= 60 ? "#f59e0b" : "#ef4444";
   return (
     <div>
-      {label && <p className="text-xs text-white/40 mb-1">{label}</p>}
-      <div className="flex items-center gap-3">
-        <div className="confidence-track flex-1">
-          <div className={`confidence-fill ${cls} transition-all duration-700`} style={{ width: `${pct}%` }} />
+      {label && <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>{label}</p>}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="confidence-track" style={{ flex: 1 }}>
+          <div className={`confidence-fill ${cls}`} style={{ width: `${pct}%`, height: "100%", transition: "width 0.7s ease" }} />
         </div>
-        <span className="text-sm font-bold min-w-[42px] text-right" style={{ color }}>{pct}%</span>
+        <span style={{ fontSize: 14, fontWeight: 800, minWidth: 42, textAlign: "right", color }}>{pct}%</span>
       </div>
     </div>
   );
@@ -27,69 +37,101 @@ export default function DiagnosisCard({ data }: Props) {
   const riskGlow = data.risk_level === "high" ? "badge-glow-red" : data.risk_level === "medium" ? "badge-glow-amber" : "badge-glow-green";
 
   return (
-    <div className="space-y-6">
-      {/* Summary Row */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="glass-premium p-5 glow-blue">
-          <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2">Weak Topic</p>
-          <p className="text-xl font-extrabold text-blue-400 tracking-tight">{String(data.weak_topic)}</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Summary metrics row ───────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div className="glass-premium glow-blue" style={{ padding: "20px 18px" }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+            Weak Topic
+          </p>
+          <p style={{ fontSize: 18, fontWeight: 800, color: "#60a5fa", letterSpacing: "-0.02em" }}>
+            {String(data.weak_topic)}
+          </p>
         </div>
-        <div className="glass-premium p-5">
-          <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2">Risk Level</p>
-          <div className="flex items-center gap-2 mt-1">
-            <span className={`badge ${riskBadge} ${riskGlow} capitalize font-bold text-sm px-3 py-1`}>
-              <span className="w-2 h-2 rounded-full" style={{ background: riskColor }} />
-              {String(data.risk_level)}
-            </span>
-          </div>
+        <div className="glass-premium" style={{ padding: "20px 18px" }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+            Risk Level
+          </p>
+          <span className={`badge ${riskBadge} ${riskGlow}`} style={{ fontWeight: 700, fontSize: 13, padding: "4px 14px" }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: riskColor }} />
+            {String(data.risk_level)}
+          </span>
         </div>
-        <div className="glass-premium p-5">
-          <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2">Confidence</p>
-          <div className="mt-1">
-            <ConfidenceMeter value={Number(data.confidence)} />
-          </div>
+        <div className="glass-premium" style={{ padding: "20px 18px" }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
+            Confidence
+          </p>
+          <ConfidenceMeter value={Number(data.confidence)} />
         </div>
       </div>
 
-      {/* Reasoning */}
-      <div className="glass-premium p-6">
-        <p className="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest mb-3">Reasoning Analysis</p>
-        <p className="text-sm text-white/80 leading-relaxed font-normal">{String(data.reasoning)}</p>
+      {/* ── Reasoning ─────────────────────────────────────────────── */}
+      <div className="glass-premium" style={{ padding: "24px 24px" }}>
+        <SectionLabel>🧠 Reasoning Analysis</SectionLabel>
+        <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.8 }}>
+          {String(data.reasoning)}
+        </p>
       </div>
 
-      {/* Evidence */}
-      <div className="glass-premium p-6">
-        <p className="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest mb-4">Evidence Gathered</p>
-        <div className="space-y-3">
+      {/* ── Evidence ──────────────────────────────────────────────── */}
+      <div className="glass-premium" style={{ padding: "24px 24px" }}>
+        <SectionLabel>📋 Evidence Gathered</SectionLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {evidence.map((e, i) => (
-            <div key={i} className="flex items-start gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] transition-all">
-              <span className="mt-0.5 w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xs text-blue-400 font-bold flex-shrink-0">
-                {i + 1}
-              </span>
-              <p className="text-sm text-white/75 leading-relaxed">{e}</p>
+            <div key={i} style={{
+              display: "flex", alignItems: "flex-start", gap: 14,
+              padding: "13px 16px", borderRadius: 12,
+              background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)",
+              transition: "background 0.15s",
+            }}>
+              <span style={{
+                flexShrink: 0, width: 26, height: 26, borderRadius: 8,
+                background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.22)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 11, fontWeight: 800, color: "#60a5fa",
+                marginTop: 1,
+              }}>{i + 1}</span>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", lineHeight: 1.7 }}>{e}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Quiz Scores */}
+      {/* ── Quiz Performance ───────────────────────────────────────── */}
       {Object.keys(quizScores).length > 0 && (
-        <div className="glass-premium p-6">
-          <p className="text-[10px] font-bold text-blue-400/80 uppercase tracking-widest mb-4">Quiz Performance per Topic</p>
-          <div className="space-y-4">
+        <div className="glass-premium" style={{ padding: "24px 24px" }}>
+          <SectionLabel>📊 Quiz Performance per Topic</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {Object.entries(quizScores).map(([topic, score]) => {
               const isWeak = topic === String(data.weak_topic);
               return (
-                <div key={topic} className={`p-3.5 rounded-xl transition-all ${isWeak ? 'bg-red-500/[0.04] border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.03)]' : 'bg-transparent border border-transparent'}`}>
-                  <div className="flex justify-between items-center text-xs mb-2">
-                    <span className={`text-sm ${isWeak ? "text-red-400 font-bold" : "text-white/70"}`}>
-                      {topic} {isWeak && <span className="text-[10px] font-semibold tracking-wider uppercase bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded ml-2">Weak Topic</span>}
+                <div key={topic} style={{
+                  padding: "14px 16px", borderRadius: 12, transition: "all 0.15s",
+                  background: isWeak ? "rgba(239,68,68,0.04)" : "transparent",
+                  border: isWeak ? "1px solid rgba(239,68,68,0.18)" : "1px solid transparent",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <span style={{ fontSize: 13, fontWeight: isWeak ? 700 : 500, color: isWeak ? "#f87171" : "rgba(255,255,255,0.7)" }}>
+                      {topic}
+                      {isWeak && (
+                        <span style={{
+                          marginLeft: 10, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em",
+                          textTransform: "uppercase", background: "rgba(239,68,68,0.2)",
+                          color: "#fca5a5", padding: "2px 8px", borderRadius: 99,
+                        }}>Weak</span>
+                      )}
                     </span>
-                    <span className={`text-sm ${isWeak ? "text-red-400 font-bold" : "text-white/60"}`}>{score}/100</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: isWeak ? "#f87171" : "rgba(255,255,255,0.6)" }}>
+                      {score}/100
+                    </span>
                   </div>
-                  <div className="progress-bar rounded-full h-2">
-                    <div className="progress-fill transition-all duration-700 h-full rounded-full"
-                      style={{ width: `${score}%`, background: isWeak ? "linear-gradient(90deg, #ef4444, #f87171)" : "linear-gradient(90deg, #3b82f6, #60a5fa)" }} />
+                  <div className="progress-bar" style={{ borderRadius: 99, height: 7 }}>
+                    <div className="progress-fill" style={{
+                      width: `${score}%`, height: "100%", borderRadius: 99,
+                      transition: "width 0.7s ease",
+                      background: isWeak ? "linear-gradient(90deg,#ef4444,#f87171)" : "linear-gradient(90deg,#3b82f6,#60a5fa)",
+                    }} />
                   </div>
                 </div>
               );
@@ -100,4 +142,3 @@ export default function DiagnosisCard({ data }: Props) {
     </div>
   );
 }
-

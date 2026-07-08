@@ -5,6 +5,15 @@ interface TopicRec { topic: string; students_struggling: number; total_students:
 
 const PRIORITY_COLOR: Record<string, string> = { High: "#ef4444", Medium: "#f59e0b", Low: "#10b981" };
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 14,
+    }}>{children}</p>
+  );
+}
+
 export default function CurriculumCard({ data }: Props) {
   const topics = (data.critical_topics as TopicRec[]) || [];
   const actions = (data.action_summary as string[]) || [];
@@ -13,74 +22,79 @@ export default function CurriculumCard({ data }: Props) {
   const healthGlow = health >= 75 ? "badge-glow-green" : health >= 55 ? "badge-glow-amber" : "badge-glow-red";
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Header metrics */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="glass-premium p-5 text-center">
-          <p className="text-3xl font-extrabold text-white/90 tracking-tight">{String(data.total_students_analyzed)}</p>
-          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-2">Cohort Size</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div className="glass-premium" style={{ padding: "20px 18px", textAlign: "center" }}>
+          <p style={{ fontSize: 24, fontWeight: 800, color: "rgba(255,255,255,0.9)", letterSpacing: "-0.02em" }}>{String(data.total_students_analyzed)}</p>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 8 }}>Cohort Size</p>
         </div>
-        <div className={`glass-premium p-5 text-center transition-all ${healthGlow}`} style={{ borderBottom: `2.5px solid ${healthColor}` }}>
-          <p className="text-3xl font-extrabold tracking-tight" style={{ color: healthColor }}>{health.toFixed(0)}</p>
-          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-2">Health Index</p>
+        <div className={`glass-premium ${healthGlow}`} style={{ padding: "20px 18px", textAlign: "center", borderBottom: `2.5px solid ${healthColor}` }}>
+          <p style={{ fontSize: 24, fontWeight: 800, color: healthColor, letterSpacing: "-0.02em" }}>{health.toFixed(0)}</p>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 8 }}>Health Index</p>
         </div>
-        <div className="glass-premium p-5 text-center badge-glow-pink" style={{ borderBottom: "2.5px solid #ec4899" }}>
-          <p className="text-3xl font-extrabold text-pink-400 tracking-tight">{topics.length}</p>
-          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-2">Critical Topics</p>
+        <div className="glass-premium badge-glow-pink" style={{ padding: "20px 18px", textAlign: "center", borderBottom: "2.5px solid #ec4899" }}>
+          <p style={{ fontSize: 24, fontWeight: 800, color: "#ec4899", letterSpacing: "-0.02em" }}>{topics.length}</p>
+          <p style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 8 }}>Critical Topics</p>
         </div>
       </div>
 
       {/* Top insight */}
-      <div className="glass-premium p-5 flex items-start gap-3 border-l-4" style={{ borderColor: "#ec4899", background: "linear-gradient(135deg, rgba(236,72,153,0.04), rgba(10,15,26,0.9))" }}>
-        <span className="text-xl filter drop-shadow-[0_0_5px_rgba(236,72,153,0.3)]">📊</span>
+      <div className="glass-premium" style={{ padding: "18px 20px", display: "flex", alignItems: "flex-start", gap: 14, borderLeft: "3px solid #ec4899", background: "linear-gradient(135deg, rgba(236,72,153,0.04), rgba(10,15,26,0.9))" }}>
+        <span style={{ fontSize: 20, marginTop: 2 }}>📊</span>
         <div>
-          <p className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">Key Cohort Insight</p>
-          <p className="text-sm text-white/80 leading-relaxed font-medium">{String(data.top_insight)}</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "#ec4899", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>Key Cohort Insight</p>
+          <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.7 }}>{String(data.top_insight)}</p>
         </div>
       </div>
 
       {/* Critical Topics */}
-      <div className="space-y-4">
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Detailed Critical Topic Risk Assessment</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <SectionLabel>Detailed Critical Topic Risk Assessment</SectionLabel>
         {topics.map((t, i) => (
-          <div key={i} className="glass-premium p-6 hover:scale-[1.005] transition-all">
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.04]">
-              <p className="font-bold text-white/90 text-sm">{t.topic}</p>
-              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 badge-glow-red">
+          <div key={i} className="glass-premium" style={{ padding: "24px 22px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>{t.topic}</p>
+              <span className="badge badge-red badge-glow-red" style={{ fontSize: 11, fontWeight: 700 }}>
                 {t.failure_rate_pct}% Fail Rate
               </span>
             </div>
             
-            <div className="mb-4">
-              <div className="progress-bar rounded-full h-2">
-                <div className="progress-fill h-full rounded-full" style={{ width: `${t.failure_rate_pct}%`, background: "linear-gradient(90deg, #ef4444, #ec4899)" }} />
+            <div style={{ marginBottom: 18 }}>
+              <div className="progress-bar" style={{ borderRadius: 99, height: 7 }}>
+                <div className="progress-fill" style={{ width: `${t.failure_rate_pct}%`, height: "100%", borderRadius: 99, background: "linear-gradient(90deg, #ef4444, #ec4899)" }} />
               </div>
-              <p className="text-[10px] text-white/40 mt-2 font-medium">⚠️ {t.students_struggling} of {t.total_students} students have dropped below passing threshold</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 8 }}>⚠️ {t.students_struggling} of {t.total_students} students have dropped below passing threshold</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="p-3.5 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-                <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold mb-2">Identified Root Causes</p>
-                <ul className="space-y-2">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>Identified Root Causes</p>
+                <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {t.root_causes.map((c, ci) => (
-                    <li key={ci} className="text-xs text-white/75 flex items-start gap-2">
-                      <span className="text-red-400 font-bold flex-shrink-0 mt-0.5">•</span>
+                    <li key={ci} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
+                      <span style={{ color: "#ef4444", fontWeight: 800, flexShrink: 0, marginTop: 2 }}>•</span>
                       {c}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-                <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold mb-2">Recommended Interventions</p>
-                <div className="space-y-2.5">
+              <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>Recommended Interventions</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {t.recommendations.map((r, ri) => (
-                    <div key={ri} className="flex items-start gap-2 text-xs">
-                      <span className="text-[9px] px-2 py-0.5 rounded font-bold uppercase flex-shrink-0 mt-0.5"
-                        style={{ background: `${PRIORITY_COLOR[r.priority]}15`, color: PRIORITY_COLOR[r.priority], border: `1px solid ${PRIORITY_COLOR[r.priority]}30` }}>
+                    <div key={ri} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12 }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                        background: `${PRIORITY_COLOR[r.priority]}15`, color: PRIORITY_COLOR[r.priority],
+                        border: `1px solid ${PRIORITY_COLOR[r.priority]}30`, flexShrink: 0, marginTop: 2,
+                      }}>
                         {r.priority}
                       </span>
-                      <span className="text-white/70 leading-normal"><span className="text-white/40">[{r.type}]</span> {r.description}</span>
+                      <span style={{ color: "rgba(255,255,255,0.72)", lineHeight: 1.5 }}>
+                        <span style={{ color: "rgba(255,255,255,0.4)" }}>[{r.type}]</span> {r.description}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -92,13 +106,13 @@ export default function CurriculumCard({ data }: Props) {
 
       {/* Actions */}
       {actions.length > 0 && (
-        <div className="glass-premium p-6">
-          <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Institutional Action Items</p>
-          <div className="space-y-3">
+        <div className="glass-premium" style={{ padding: "24px 24px" }}>
+          <SectionLabel>Institutional Action Items</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {actions.map((a, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] transition-all">
-                <span className="text-pink-400 font-bold flex-shrink-0">→</span>
-                <span className="text-xs text-white/80 font-medium leading-relaxed">{a}</span>
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <span style={{ color: "#ec4899", fontWeight: 800, flexShrink: 0 }}>→</span>
+                <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.8)", fontWeight: 500, lineHeight: 1.6 }}>{a}</span>
               </div>
             ))}
           </div>

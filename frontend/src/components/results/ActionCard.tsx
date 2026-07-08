@@ -2,85 +2,143 @@
 
 interface Props { data: Record<string, unknown>; studentName: string; }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 14,
+    }}>{children}</p>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "10px 14px", borderRadius: 10,
+      background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+    }}>
+      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600, textAlign: "right", maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</span>
+    </div>
+  );
+}
+
 export default function ActionCard({ data }: Props) {
-  const rc = (data.revision_class as Record<string, unknown>) || {};
-  const quiz = (data.quiz as Record<string, unknown>) || {};
-  const notifications = (data.notifications_sent as string[]) || [];
+  const rc = (data.revision_class as Record<string, any>) || {};
+  const quiz = (data.quiz as Record<string, any>) || {};
+  const notifications = (data.notifications_sent as any[]) || [];
 
   return (
-    <div className="space-y-6">
-      {/* Status Banner */}
-      <div className="glass-premium p-5 flex items-start gap-4 border-l-4 border-l-green-500 badge-glow-green"
-        style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.04), rgba(10,15,26,0.85))" }}>
-        <span className="text-3xl filter drop-shadow-[0_0_5px_rgba(16,185,129,0.2)]">✅</span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Status Banner ──────────────────────────────────────────── */}
+      <div className="glass-premium badge-glow-green" style={{
+        padding: "20px 24px", display: "flex", alignItems: "center", gap: 18,
+        borderLeft: "3px solid #10b981",
+        background: "linear-gradient(135deg, rgba(16,185,129,0.05), rgba(10,15,26,0.88))",
+      }}>
+        <span style={{ fontSize: 36, lineHeight: 1 }}>✅</span>
         <div>
-          <p className="font-extrabold text-green-400 text-lg tracking-tight">Automated Actions Generated</p>
-          <p className="text-sm text-white/70 mt-1 leading-relaxed">{String(data.action_summary)}</p>
+          <p style={{ fontSize: 16, fontWeight: 800, color: "#34d399", letterSpacing: "-0.02em", marginBottom: 6 }}>
+            Automated Actions Generated
+          </p>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.68)", lineHeight: 1.7 }}>
+            {String(data.action_summary)}
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* ── Revision Class + Quiz ──────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+
         {/* Revision Class */}
-        <div className="glass-premium p-6 border-t-2 border-t-blue-500">
-          <div className="flex items-center justify-between mb-4 border-b border-white/[0.05] pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🏫</span>
-              <p className="text-sm font-bold text-blue-400 uppercase tracking-widest">Revision Class</p>
+        <div className="glass-premium" style={{ padding: "24px 22px", borderTop: "2.5px solid #3b82f6" }}>
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            marginBottom: 18, paddingBottom: 14,
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18 }}>🏫</span>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "#60a5fa", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Revision Class
+              </p>
             </div>
-            <span className="badge badge-blue font-bold text-[10px] px-2.5 py-0.5 uppercase">
+            <span className="badge badge-blue" style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px" }}>
               {String(rc.status)}
             </span>
           </div>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Topic Title</span><span className="text-white/80 font-semibold text-right max-w-[70%] truncate">{String(rc.title)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Scheduled</span><span className="text-white/80 font-semibold">{String(rc.scheduled_date)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Duration</span><span className="text-white/80 font-semibold">{String(rc.duration)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Mode / Format</span><span className="text-white/80 font-semibold">{String(rc.mode)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Location</span><span className="text-white/80 font-semibold">{String(rc.location)}</span></div>
-            <div className="pt-3 border-t border-white/[0.05] mt-1">
-              <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-1">Instructor Directive</p>
-              <p className="text-white/70 bg-white/[0.02] border border-white/[0.04] p-2.5 rounded-lg leading-relaxed italic">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <InfoRow label="Topic" value={String(rc.title)} />
+            <InfoRow label="Scheduled" value={String(rc.scheduled_date)} />
+            <InfoRow label="Duration" value={String(rc.duration)} />
+            <InfoRow label="Mode" value={String(rc.mode)} />
+            <InfoRow label="Location" value={String(rc.location)} />
+          </div>
+          {rc.instructor_note && (
+            <div style={{
+              marginTop: 14, padding: "12px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
+            }}>
+              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
+                Instructor Note
+              </p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.7, fontStyle: "italic" }}>
                 {String(rc.instructor_note)}
               </p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Quiz */}
-        <div className="glass-premium p-6 border-t-2 border-t-amber-500">
-          <div className="flex items-center justify-between mb-4 border-b border-white/[0.05] pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">📝</span>
-              <p className="text-sm font-bold text-amber-400 uppercase tracking-widest">Diagnostic Quiz</p>
+        <div className="glass-premium" style={{ padding: "24px 22px", borderTop: "2.5px solid #f59e0b" }}>
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            marginBottom: 18, paddingBottom: 14,
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18 }}>📝</span>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Diagnostic Quiz
+              </p>
             </div>
-            <span className="badge badge-amber font-bold text-[10px] px-2.5 py-0.5 uppercase">
+            <span className="badge badge-amber" style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px" }}>
               {String(quiz.status)}
             </span>
           </div>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Quiz Title</span><span className="text-white/80 font-semibold text-right max-w-[70%] truncate">{String(quiz.title)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Questions</span><span className="text-white/80 font-semibold">{String(quiz.num_questions)} items</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Due Date</span><span className="text-white/80 font-semibold">{String(quiz.due_date)}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Passing Score</span><span className="text-white/80 font-semibold">{String(quiz.passing_score)}%</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Auto-graded</span><span className="text-green-400 font-bold">{quiz.auto_graded ? "Yes" : "No"}</span></div>
-            <div className="flex justify-between items-center p-2 rounded bg-white/[0.01] border border-white/[0.03]"><span className="text-white/40">Retakes Allowed</span><span className="text-white/80 font-semibold">{quiz.retake_allowed ? "Yes" : "No"}</span></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <InfoRow label="Quiz Title" value={String(quiz.title)} />
+            <InfoRow label="Questions" value={`${String(quiz.num_questions)} items`} />
+            <InfoRow label="Due Date" value={String(quiz.due_date)} />
+            <InfoRow label="Passing Score" value={`${String(quiz.passing_score)}%`} />
+            <InfoRow label="Auto-graded" value={quiz.auto_graded ? "Yes ✓" : "No"} />
+            <InfoRow label="Retakes" value={quiz.retake_allowed ? "Allowed" : "Not Allowed"} />
           </div>
         </div>
       </div>
 
-      {/* Notifications */}
-      <div className="glass-premium p-6">
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">LMS Notifications Log</p>
-        <div className="space-y-3">
+      {/* ── Notifications Log ──────────────────────────────────────── */}
+      <div className="glass-premium" style={{ padding: "24px 24px" }}>
+        <SectionLabel>🔔 LMS Notifications Log</SectionLabel>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {notifications.map((n, i) => (
-            <div key={i} className="text-xs text-white/70 flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.01] border border-white/[0.03]">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500 badge-glow-green flex-shrink-0 animate-pulse" />
-              <span className="font-medium">{n}</span>
+            <div key={i} style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "11px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.72)", fontWeight: 500 }}>{n}</span>
             </div>
           ))}
         </div>
-        <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between">
-          <p className="text-[11px] font-semibold text-amber-400/80 bg-amber-400/5 border border-amber-400/10 px-3 py-1.5 rounded-lg w-full text-center">
+        <div style={{
+          marginTop: 16, padding: "10px 14px", borderRadius: 10, textAlign: "center",
+          background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.15)",
+        }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(251,191,36,0.8)" }}>
             🔔 {String(data.lms_status)}
           </p>
         </div>
@@ -88,4 +146,3 @@ export default function ActionCard({ data }: Props) {
     </div>
   );
 }
-

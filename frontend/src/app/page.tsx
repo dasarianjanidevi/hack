@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -37,6 +38,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetch(`${API_BASE}/api/students`)
@@ -50,6 +52,18 @@ export default function HomePage() {
       .finally(() => setFetching(false));
   }, []);
 
+  // Live filter by roll no, name, or batch
+  const filteredStudents = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return students;
+    return students.filter(
+      (s) =>
+        s.student_id.toLowerCase().includes(q) ||
+        s.name.toLowerCase().includes(q) ||
+        s.batch.toLowerCase().includes(q)
+    );
+  }, [students, searchQuery]);
+
   const handleRun = () => {
     if (!selected) return;
     setLoading(true);
@@ -62,6 +76,14 @@ export default function HomePage() {
     if (n < 75) return "#f59e0b";
     return "#10b981";
   };
+
+  // Auto-clear selection if filtered out
+  useEffect(() => {
+    if (selected && searchQuery) {
+      const stillVisible = filteredStudents.find((s) => s.student_id === selected.student_id);
+      if (!stillVisible) setSelected(null);
+    }
+  }, [filteredStudents, searchQuery]);
 
   return (
     <div className="mesh-bg min-h-screen flex flex-col">
@@ -89,12 +111,12 @@ export default function HomePage() {
             boxShadow: "0 4px 12px rgba(59,130,246,0.35)",
           }}>E</div>
           <span style={{ fontWeight: 700, fontSize: 16, color: "rgba(255,255,255,0.92)", letterSpacing: "-0.02em" }}>
-            EduOS<span style={{ color: "#3b82f6" }}> AI</span>
+            EduOS<span style={{ color: "#3b82f6" }}>AI</span>
           </span>
           <span className="badge badge-blue" style={{ fontSize: 11 }}>v1.0 · Hackathon</span>
         </div>
 
-        {/* Nav stats */}
+        {/* Nav right: stats + add student */}
         <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
           {STATS.map((s) => (
             <div key={s.label} style={{ textAlign: "center" }}>
@@ -102,6 +124,18 @@ export default function HomePage() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</div>
             </div>
           ))}
+          <Link href="/students" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "7px 16px", borderRadius: 8,
+            background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
+            color: "#6ee7b7", fontSize: 12, fontWeight: 600,
+            textDecoration: "none", transition: "all 0.2s ease",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(16,185,129,0.18)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(16,185,129,0.1)"; }}
+          >
+            ➕ Add Student
+          </Link>
         </div>
       </nav>
 
@@ -160,7 +194,7 @@ export default function HomePage() {
         {/* ── Selector Card ────────────────────────────────────────────── */}
         <div
           className="glass-premium animate-fade-slide-up"
-          style={{ width: "100%", maxWidth: 460, padding: "32px", animationDelay: "0.24s" }}
+          style={{ width: "100%", maxWidth: 500, padding: "32px", animationDelay: "0.24s" }}
         >
           {/* Card header */}
           <div style={{ marginBottom: 24 }}>
@@ -168,7 +202,7 @@ export default function HomePage() {
               Select a Student
             </h2>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", lineHeight: 1.6 }}>
-              Choose a student to run the full 8-agent diagnostic pipeline
+              Search by roll number, name, or batch — then run the full 8-agent pipeline
             </p>
           </div>
 
@@ -188,13 +222,57 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              {/* Select */}
+              {/* ── Search bar ── */}
+              <div style={{ position: "relative", marginBottom: 12 }}>
+                <div style={{
+                  position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                  pointerEvents: "none", color: "rgba(255,255,255,0.3)", fontSize: 15,
+                }}>🔍</div>
+                <input
+                  id="student-search"
+                  type="text"
+                  placeholder="Search by Roll No (e.g. S042) or name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "100%", padding: "11px 16px 11px 38px",
+                    borderRadius: 10, appearance: "none",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(255,255,255,0.85)", fontSize: 13,
+                    outline: "none", transition: "border-color 0.2s ease",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "rgba(59,130,246,0.5)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    style={{
+                      position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                      background: "rgba(255,255,255,0.08)", border: "none",
+                      color: "rgba(255,255,255,0.5)", cursor: "pointer",
+                      width: 22, height: 22, borderRadius: "50%", fontSize: 12,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}
+                  >✕</button>
+                )}
+              </div>
+
+              {/* Search result count */}
+              {searchQuery && (
+                <div style={{ marginBottom: 10, fontSize: 11, color: "rgba(255,255,255,0.3)", textAlign: "right" }}>
+                  {filteredStudents.length} student{filteredStudents.length !== 1 ? "s" : ""} found
+                </div>
+              )}
+
+              {/* Select dropdown */}
               <div style={{ position: "relative", marginBottom: 16 }}>
                 <select
                   id="student-select"
                   value={selected?.student_id || ""}
                   onChange={(e) => {
-                    const s = students.find((st) => st.student_id === e.target.value);
+                    const s = filteredStudents.find((st) => st.student_id === e.target.value);
                     setSelected(s || null);
                   }}
                   style={{
@@ -210,9 +288,9 @@ export default function HomePage() {
                   onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
                 >
                   <option value="" style={{ background: "#0a0f1a" }}>— Select a student —</option>
-                  {students.map((s) => (
+                  {filteredStudents.map((s) => (
                     <option key={s.student_id} value={s.student_id} style={{ background: "#0a0f1a" }}>
-                      {s.name} · {s.batch} · {s.attendance_pct}% attendance
+                      [{s.student_id}] {s.name} · {s.batch} · {s.attendance_pct}% attendance
                     </option>
                   ))}
                 </select>
@@ -223,11 +301,23 @@ export default function HomePage() {
                 </svg>
               </div>
 
+              {/* No results */}
+              {searchQuery && filteredStudents.length === 0 && (
+                <div style={{
+                  padding: "12px 16px", borderRadius: 10, marginBottom: 16,
+                  background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)",
+                  fontSize: 13, color: "rgba(245,158,11,0.8)", textAlign: "center",
+                }}>
+                  No student found for &quot;{searchQuery}&quot; —{" "}
+                  <Link href="/students" style={{ color: "#fbbf24", textDecoration: "underline" }}>Add new student</Link>
+                </div>
+              )}
+
               {/* Student info pills */}
               {selected && (
                 <div className="animate-fade-in" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 20 }}>
                   <div className="stat-block">
-                    <div className="stat-label">ID</div>
+                    <div className="stat-label">Roll No</div>
                     <div className="stat-value" style={{ fontFamily: "monospace", fontSize: 13 }}>{selected.student_id}</div>
                   </div>
                   <div className="stat-block">
@@ -262,6 +352,19 @@ export default function HomePage() {
                   <>🚀 Run Full Agent Pipeline</>
                 )}
               </button>
+
+              {/* Add Student link */}
+              <div style={{ marginTop: 14, textAlign: "center" }}>
+                <Link href="/students" style={{
+                  fontSize: 12, color: "rgba(255,255,255,0.3)",
+                  textDecoration: "none", transition: "color 0.2s",
+                }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+                >
+                  ➕ Manually add a new student
+                </Link>
+              </div>
             </>
           )}
         </div>

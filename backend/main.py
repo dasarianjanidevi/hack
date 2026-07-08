@@ -71,9 +71,16 @@ class RunResponse(BaseModel):
     stream_url: str
 
 
+class CreateStudentRequest(BaseModel):
+    student_id: str
+    name: str
+    batch: str
+    attendance_pct: int
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def get_all_students() -> list[dict]:
+def get_all_students(query: str = "") -> list[dict]:
     filepath = os.path.join(DATA_DIR, "students.csv")
     students = []
     with open(filepath, newline="", encoding="utf-8") as f:
@@ -85,7 +92,34 @@ def get_all_students() -> list[dict]:
                 "batch": row["batch"],
                 "attendance_pct": row["attendance_pct"],
             })
+    if query:
+        q = query.strip().lower()
+        students = [
+            s for s in students
+            if q in s["student_id"].lower() or q in s["name"].lower() or q in s["batch"].lower()
+        ]
     return students
+
+
+def student_id_exists(student_id: str) -> bool:
+    filepath = os.path.join(DATA_DIR, "students.csv")
+    with open(filepath, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["student_id"] == student_id:
+                return True
+    return False
+
+
+def append_student_to_csv(student: CreateStudentRequest):
+    filepath = os.path.join(DATA_DIR, "students.csv")
+    with open(filepath, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            student.student_id,
+            student.name,
+            student.batch,
+            student.attendance_pct,
+        ])
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -101,10 +135,41 @@ async def root():
 
 
 @app.get("/api/students")
-async def list_students():
-    """Return all students for the dropdown selector."""
-    students = get_all_students()
+async def list_students(q: str = ""):
+    """Return all students for the dropdown selector. Supports ?q= search by roll no or name."""
+    students = get_all_students(query=q)
     return {"students": students, "count": len(students)}
+
+
+@app.post("/api/students")
+async def create_student(request: CreateStudentRequest):
+    """Create a new student and append to students.csv."""
+    # Validate student_id format
+    if not request.student_id.strip():
+        raise HTTPException(status_code=400, detail="student_id cannot be empty.")
+    if not request.name.strip():
+        raise HTTPException(status_code=400, detail="Student name cannot be empty.")
+    if student_id_exists(request.student_id.strip()):
+        raise HTTPException(status_code=409, detail=f"Student ID '{request.student_id}' already exists.")
+    if not (0 <= request.attendance_pct <= 100):
+        raise HTTPException(status_code=400, detail="attendance_pct must be between 0 and 100.")
+
+    student_data = CreateStudentRequest(
+        student_id=request.student_id.strip().upper(),
+        name=request.name.strip(),
+        batch=request.batch.strip(),
+        attendance_pct=request.attendance_pct,
+    )
+    append_student_to_csv(student_data)
+    return {
+        "status": "created",
+        "student": {
+            "student_id": student_data.student_id,
+            "name": student_data.name,
+            "batch": student_data.batch,
+            "attendance_pct": str(student_data.attendance_pct),
+        },
+    }
 
 
 @app.post("/api/run")

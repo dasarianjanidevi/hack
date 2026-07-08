@@ -1,75 +1,122 @@
 "use client";
 
 interface Props { data: Record<string, unknown>; studentName: string; }
-
 interface Day { day: number; focus: string; concepts: string[]; resources: string[]; exercise: string; estimated_time: string; }
 
-const DAY_COLORS = ["#3b82f6","#8b5cf6","#06b6d4","#10b981","#f59e0b"];
+const DAY_COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4", "#10b981", "#f59e0b"];
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 10, fontWeight: 700, letterSpacing: "0.1em",
+      textTransform: "uppercase", color: "rgba(255,255,255,0.3)", marginBottom: 14,
+    }}>{children}</p>
+  );
+}
 
 export default function TutorCard({ data }: Props) {
   const days = (data.days as Day[]) || [];
 
   return (
-    <div className="space-y-6">
-      {/* Goal + Metric */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="glass-premium p-5 border-t-2 border-t-blue-500">
-          <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">🎯 Overall Goal</p>
-          <p className="text-sm text-white/80 leading-relaxed font-medium">{String(data.overall_goal)}</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* ── Goal + Metric ──────────────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="glass-premium" style={{ padding: "22px 20px", borderTop: "2.5px solid #3b82f6" }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "#60a5fa", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+            🎯 Overall Goal
+          </p>
+          <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.7 }}>
+            {String(data.overall_goal)}
+          </p>
         </div>
-        <div className="glass-premium p-5 border-t-2 border-t-teal-500">
-          <p className="text-[10px] font-bold text-teal-400 uppercase tracking-widest mb-2">🏆 Success Metric</p>
-          <p className="text-sm text-white/80 leading-relaxed font-medium">{String(data.success_metric)}</p>
+        <div className="glass-premium" style={{ padding: "22px 20px", borderTop: "2.5px solid #14b8a6" }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "#2dd4bf", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+            🏆 Success Metric
+          </p>
+          <p style={{ fontSize: 13.5, color: "rgba(255,255,255,0.8)", lineHeight: 1.7 }}>
+            {String(data.success_metric)}
+          </p>
         </div>
       </div>
 
-      {/* Prereq check */}
-      <div className="glass-premium p-4 flex items-start gap-3 border-l-4" style={{ borderColor: "#f59e0b", background: "rgba(245,158,11,0.04)" }}>
-        <span className="text-xl text-amber-500 mt-0.5">⚠️</span>
+      {/* ── Prerequisite ──────────────────────────────────────────── */}
+      <div className="glass-premium" style={{
+        padding: "18px 20px", display: "flex", alignItems: "flex-start", gap: 14,
+        borderLeft: "3px solid #f59e0b", background: "rgba(245,158,11,0.04)",
+      }}>
+        <span style={{ fontSize: 20, marginTop: 2 }}>⚠️</span>
         <div>
-          <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Before Day 1 — Prerequisite Verification</p>
-          <p className="text-xs text-white/70 leading-relaxed">{String(data.prerequisite_check)}</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "#fbbf24", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
+            Before Day 1 — Prerequisite Check
+          </p>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", lineHeight: 1.7 }}>
+            {String(data.prerequisite_check)}
+          </p>
         </div>
       </div>
 
-      {/* 5-Day Plan */}
-      <div className="space-y-4">
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Personalized 5-Day Study Program</p>
+      {/* ── 5-Day Plan ─────────────────────────────────────────────── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <SectionLabel>📅 Personalized 5-Day Study Program</SectionLabel>
         {days.map((day, i) => (
-          <div key={day.day} className="glass-premium p-6 animate-fade-slide-up hover:scale-[1.005] transition-all" style={{ animationDelay: `${i * 0.08}s` }}>
-            <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0 shadow-lg"
-                  style={{ background: `linear-gradient(135deg, ${DAY_COLORS[i]}, #000000)` }}>
-                  Day {day.day}
+          <div key={day.day} className="glass-premium animate-fade-slide-up" style={{
+            padding: "24px 22px", animationDelay: `${i * 0.08}s`,
+            transition: "transform 0.15s ease",
+          }}>
+            {/* Day header */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              paddingBottom: 16, marginBottom: 18,
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: 800, color: "white",
+                  background: `linear-gradient(135deg, ${DAY_COLORS[i]}, #00000060)`,
+                  boxShadow: `0 4px 14px ${DAY_COLORS[i]}35`,
+                }}>
+                  D{day.day}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white/90">{day.focus}</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>{day.focus}</p>
                 </div>
               </div>
-              <span className="text-[10px] px-2.5 py-1 rounded-full font-bold bg-white/[0.04] text-white/60 border border-white/[0.08] flex items-center gap-1">
+              <span style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: "0.05em",
+                padding: "5px 12px", borderRadius: 99, flexShrink: 0,
+                background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}>
                 ⏱ {day.estimated_time}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-              <div className="p-3.5 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-                <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold mb-2">Core Concepts Covered</p>
-                <ul className="space-y-2">
+            {/* Concepts + Resources */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+              <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+                  Core Concepts
+                </p>
+                <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {day.concepts.map((c, ci) => (
-                    <li key={ci} className="text-xs text-white/75 flex items-start gap-2">
-                      <span style={{ color: DAY_COLORS[i] }} className="font-bold flex-shrink-0 mt-0.5">•</span>
+                    <li key={ci} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
+                      <span style={{ color: DAY_COLORS[i], fontWeight: 800, flexShrink: 0, marginTop: 2 }}>•</span>
                       {c}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-3.5 rounded-xl bg-white/[0.01] border border-white/[0.03]">
-                <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold mb-2">Learning Resources</p>
-                <ul className="space-y-2">
+              <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+                  Learning Resources
+                </p>
+                <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {day.resources.map((r, ri) => (
-                    <li key={ri} className="text-xs text-white/75 flex items-start gap-2">
-                      <span className="text-cyan-400 font-bold flex-shrink-0 mt-0.5">→</span>
+                    <li key={ri} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
+                      <span style={{ color: "#06b6d4", fontWeight: 800, flexShrink: 0, marginTop: 2 }}>→</span>
                       {r}
                     </li>
                   ))}
@@ -77,10 +124,17 @@ export default function TutorCard({ data }: Props) {
               </div>
             </div>
 
-            <div className="px-4 py-3 rounded-xl text-xs flex items-start gap-2"
-              style={{ background: `${DAY_COLORS[i]}08`, border: `1px solid ${DAY_COLORS[i]}25`, color: "rgba(255,255,255,0.75)" }}>
-              <span className="font-bold uppercase tracking-widest text-[10px]" style={{ color: DAY_COLORS[i] }}>Exercise:</span>
-              <span className="leading-relaxed">{day.exercise}</span>
+            {/* Exercise */}
+            <div style={{
+              padding: "12px 16px", borderRadius: 12, fontSize: 12.5, lineHeight: 1.7,
+              color: "rgba(255,255,255,0.75)",
+              background: `${DAY_COLORS[i]}08`, border: `1px solid ${DAY_COLORS[i]}22`,
+              display: "flex", alignItems: "flex-start", gap: 8,
+            }}>
+              <span style={{ fontWeight: 800, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: DAY_COLORS[i], flexShrink: 0, marginTop: 2 }}>
+                Exercise:
+              </span>
+              {day.exercise}
             </div>
           </div>
         ))}
@@ -88,4 +142,3 @@ export default function TutorCard({ data }: Props) {
     </div>
   );
 }
-
